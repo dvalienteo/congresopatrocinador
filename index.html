@@ -785,24 +785,38 @@ nav{
     </div>
     <div class="modal-body">
       <div class="alert alert-info" style="font-size:13px;margin-bottom:20px;">
-        Los cambios se guardan localmente en este navegador. El usuario <strong>admin</strong> no puede eliminarse.
+        Solo el <strong>admin</strong> puede gestionar usuarios. El usuario <strong>admin</strong> no puede eliminarse.
       </div>
-      <div id="users-table-wrap"></div>
+      <div id="users-table-wrap" style="overflow-x:auto;margin-bottom:4px;"></div>
       <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
-      <h4 style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px;">Agregar Nuevo Usuario</h4>
+      <h4 id="user-form-title" style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px;">Agregar Nuevo Usuario</h4>
+      <input type="hidden" id="edit-user-idx" value="">
       <div class="row2">
-        <div class="fg"><label>Usuario</label><input type="text" id="nu-user" placeholder="nombre_usuario"></div>
-        <div class="fg"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="contraseña segura"></div>
+        <div class="fg"><label>Usuario <span style="color:var(--danger);">*</span></label><input type="text" id="nu-user" placeholder="nombre_usuario" autocomplete="off"></div>
+        <div class="fg"><label>Nombre completo</label><input type="text" id="nu-name" placeholder="Nombre y apellido" autocomplete="off"></div>
       </div>
-      <div class="fg">
-        <label>Rol</label>
-        <select id="nu-role">
-          <option value="tesorero">Tesorero</option>
-          <option value="admin">Admin</option>
-        </select>
+      <div class="row2">
+        <div class="fg">
+          <label>Contraseña <span style="color:var(--danger);">*</span></label>
+          <div style="position:relative;">
+            <input type="text" id="nu-pass" placeholder="contraseña segura" autocomplete="off" style="padding-right:44px;">
+            <button type="button" onclick="document.getElementById('nu-pass').type=document.getElementById('nu-pass').type==='text'?'password':'text'"
+              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Rol</label>
+          <select id="nu-role">
+            <option value="tesorero">Tesorero</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
       </div>
       <div id="user-err" class="alert alert-danger" style="display:none;"></div>
-      <button class="btn btn-primary" onclick="addUser()">Agregar usuario</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" id="user-form-btn" onclick="addUser()">Agregar usuario</button>
+        <button class="btn btn-outline" onclick="cancelEditUser()">Cancelar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -845,13 +859,13 @@ nav{
           <li>En tu hoja de Sheets, ve a <strong>Extensiones → Apps Script</strong>.</li>
           <li>Borra todo el código existente y pega el siguiente:</li>
         </ul>
-        <div class="code-block">const SHEET_ID = 'TU_SHEET_ID_AQUI';
-const FOLDER_ID = 'TU_FOLDER_ID_AQUI';
+        <div class="code-block">var SHEET_ID = '1UvrK3AC9fEbdwI1XO1yvLNXPwOY1JAnrvCkQRjWX3VQ';
+var FOLDER_ID = '1feN_k3g4mcE01Fl4Jm8Xa8iDHtwne4-K';
 
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
-    
+
     if (data.type === 'receipt') {
       var ss = SpreadsheetApp.openById(SHEET_ID);
       var sheet = ss.getActiveSheet();
@@ -862,10 +876,10 @@ function doPost(e) {
         data.obs, new Date()
       ]);
     }
-    
+
     if (data.type === 'file') {
       var folder = DriveApp.getFolderById(FOLDER_ID);
-      var sub = null;
+      var sub;
       var folders = folder.getFoldersByName(data.sponsor);
       if (folders.hasNext()) { sub = folders.next(); }
       else { sub = folder.createFolder(data.sponsor); }
@@ -875,19 +889,57 @@ function doPost(e) {
       );
       sub.createFile(blob);
     }
-    
+
     return ContentService
-      .createTextOutput(JSON.stringify({ok:true}))
+      .createTextOutput(JSON.stringify({ok: true}))
       .setMimeType(ContentService.MimeType.JSON);
+
   } catch(err) {
     return ContentService
-      .createTextOutput(JSON.stringify({ok:false,error:err.toString()}))
+      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
+// Permite verificar patrocinadores desde cualquier dispositivo
 function doGet(e) {
-  return ContentService.createTextOutput('OK');
+  var action = e.parameter.action;
+  if (action === 'verify') {
+    var no     = e.parameter.no;
+    var patron = e.parameter.patron;
+    var ss     = SpreadsheetApp.openById(SHEET_ID);
+    var sheet  = ss.getActiveSheet();
+    var data   = sheet.getDataRange().getValues();
+    // Row 0 = headers: No.Recibo|Fecha|Lugar|Patrocinador|MontoQ|EnLetras|Plan|Obs|Timestamp
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      var rowNo     = String(row[0]).trim().padStart(3,'0');
+      var rowPatron = String(row[3]).trim();
+      if (rowNo === no && rowPatron === patron) {
+        var fecha = String(row[1]).split('/');
+        return ContentService
+          .createTextOutput(JSON.stringify({
+            found: true,
+            no:          rowNo,
+            fecha:       row[1],
+            dia:         fecha[0]||'',
+            mes:         fecha[1]||'',
+            anio:        fecha[2]||'',
+            lugar:       row[2],
+            patrocinador:rowPatron,
+            monto:       row[4],
+            letras:      row[5],
+            plan:        row[6],
+            obs:         row[7]||''
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({found: false}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput('IV Congreso API OK');
 }</div>
         <p style="font-size:12px;color:var(--muted);margin-top:8px;">⚠ Reemplaza <code>TU_SHEET_ID_AQUI</code> y <code>TU_FOLDER_ID_AQUI</code> con tus IDs reales.</p>
       </div>
@@ -1018,21 +1070,32 @@ function prefillDate(){
 // ══════════════════════════════════════════
 function openUserMgr(){
   renderUsersTable();
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-name').value='';
+  document.getElementById('nu-pass').value='';
+  document.getElementById('nu-role').value='tesorero';
+  document.getElementById('user-err').style.display='none';
+  document.getElementById('edit-user-idx').value='';
+  document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+  document.getElementById('user-form-btn').textContent='Agregar usuario';
   openModal('modal-users');
 }
 
 function renderUsersTable(){
   var users=DB.get('users',[]);
-  var html='<table class="user-table"><thead><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>';
+  var html='<table class="user-table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Contraseña</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>';
   users.forEach(function(u,i){
+    var passShow='<span id="pass-dots-'+i+'">••••••••</span><span id="pass-text-'+i+'" style="display:none;">'+u.pass+'</span>';
+    var eyeBtn='<button class="btn btn-sm" style="padding:4px 8px;font-size:12px;background:var(--bg);border:1px solid var(--border);color:var(--navy);" onclick="togglePass('+i+')" title="Ver/ocultar">👁</button>';
     html+='<tr>';
     html+='<td><strong>'+u.user+'</strong></td>';
+    html+='<td>'+(u.name||'—')+'</td>';
+    html+='<td style="white-space:nowrap;">'+passShow+' '+eyeBtn+'</td>';
     html+='<td><span class="badge '+(u.role==='admin'?'badge-admin':'badge-basic')+'">'+u.role+'</span></td>';
     html+='<td><div class="user-actions">';
+    html+='<button class="btn btn-navy btn-sm" onclick="editUser('+i+')">✏ Editar</button>';
     if(u.user!=='admin'){
       html+='<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')">Eliminar</button>';
-    } else {
-      html+='<span style="font-size:12px;color:var(--muted);">No eliminable</span>';
     }
     html+='</div></td>';
     html+='</tr>';
@@ -1041,30 +1104,90 @@ function renderUsersTable(){
   document.getElementById('users-table-wrap').innerHTML=html;
 }
 
+function togglePass(i){
+  var dots=document.getElementById('pass-dots-'+i);
+  var text=document.getElementById('pass-text-'+i);
+  if(text.style.display==='none'){ dots.style.display='none'; text.style.display='inline'; }
+  else { dots.style.display='inline'; text.style.display='none'; }
+}
+
+function editUser(i){
+  var users=DB.get('users',[]);
+  var u=users[i];
+  document.getElementById('nu-user').value=u.user;
+  document.getElementById('nu-name').value=u.name||'';
+  document.getElementById('nu-pass').value=u.pass;
+  document.getElementById('nu-role').value=u.role;
+  document.getElementById('edit-user-idx').value=i;
+  document.getElementById('user-form-title').textContent='Editar Usuario: '+u.user;
+  document.getElementById('user-form-btn').textContent='Guardar cambios';
+  // Disable username field when editing admin
+  document.getElementById('nu-user').disabled=(u.user==='admin');
+  document.getElementById('user-err').style.display='none';
+}
+
 function addUser(){
+  var editIdx=document.getElementById('edit-user-idx').value;
   var u=document.getElementById('nu-user').value.trim();
-  var p=document.getElementById('nu-pass').value;
+  var n=document.getElementById('nu-name').value.trim();
+  var p=document.getElementById('nu-pass').value.trim();
   var r=document.getElementById('nu-role').value;
   var err=document.getElementById('user-err');
-  if(!u||!p){ err.style.display='block';err.textContent='Completa usuario y contraseña.';return; }
+  if(!u||!p){ err.style.display='block';err.textContent='Completa al menos usuario y contraseña.';return; }
   var users=DB.get('users',[]);
-  if(users.find(x=>x.user===u)){ err.style.display='block';err.textContent='Ese nombre de usuario ya existe.';return; }
-  users.push({user:u,pass:p,role:r});
-  DB.set('users',users);
-  err.style.display='none';
-  document.getElementById('nu-user').value='';
-  document.getElementById('nu-pass').value='';
-  renderUsersTable();
-  showToast('✓ Usuario "'+u+'" agregado correctamente.');
+  if(editIdx!==''){
+    // EDIT mode
+    var idx=parseInt(editIdx);
+    users[idx].name=n;
+    users[idx].pass=p;
+    users[idx].role=r;
+    if(users[idx].user!=='admin') users[idx].user=u;
+    DB.set('users',users);
+    err.style.display='none';
+    document.getElementById('edit-user-idx').value='';
+    document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+    document.getElementById('user-form-btn').textContent='Agregar usuario';
+    document.getElementById('nu-user').disabled=false;
+    document.getElementById('nu-user').value='';
+    document.getElementById('nu-name').value='';
+    document.getElementById('nu-pass').value='';
+    document.getElementById('nu-role').value='tesorero';
+    renderUsersTable();
+    showToast('✓ Usuario "'+u+'" actualizado correctamente.');
+  } else {
+    // ADD mode
+    if(users.find(x=>x.user===u)){ err.style.display='block';err.textContent='Ese nombre de usuario ya existe.';return; }
+    users.push({user:u,name:n,pass:p,role:r});
+    DB.set('users',users);
+    err.style.display='none';
+    document.getElementById('nu-user').value='';
+    document.getElementById('nu-name').value='';
+    document.getElementById('nu-pass').value='';
+    document.getElementById('nu-role').value='tesorero';
+    renderUsersTable();
+    showToast('✓ Usuario "'+u+'" agregado correctamente.');
+  }
 }
 
 function deleteUser(i){
-  if(!confirm('¿Eliminar este usuario?')) return;
+  if(!confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
   var users=DB.get('users',[]);
   users.splice(i,1);
   DB.set('users',users);
   renderUsersTable();
   showToast('Usuario eliminado.');
+}
+
+function cancelEditUser(){
+  document.getElementById('edit-user-idx').value='';
+  document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+  document.getElementById('user-form-btn').textContent='Agregar usuario';
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-name').value='';
+  document.getElementById('nu-pass').value='';
+  document.getElementById('nu-role').value='tesorero';
+  document.getElementById('nu-user').disabled=false;
+  document.getElementById('user-err').style.display='none';
 }
 
 // ══════════════════════════════════════════
@@ -1397,7 +1520,17 @@ function updateStats(){
 // ══════════════════════════════════════════
 function sendToSheets(r){
   if(!sheetsUrl) return;
-  var payload=Object.assign({type:'receipt',fecha:r.dia+'/'+r.mes+'/'+r.anio},r);
+  var payload={
+    type:'receipt',
+    no: r.no,
+    fecha: r.dia+'/'+r.mes+'/'+r.anio,
+    lugar: r.lugar,
+    patrocinador: r.patron,
+    monto: r.monto,
+    letras: r.letras,
+    plan: r.plan,
+    obs: r.obs||''
+  };
   fetch(sheetsUrl,{
     method:'POST',mode:'no-cors',
     headers:{'Content-Type':'application/json'},
@@ -1421,15 +1554,54 @@ function verifySponsor(){
   var name=document.getElementById('sp-name').value.trim();
   var no=document.getElementById('sp-recibo').value.trim().padStart(3,'0');
   var err=document.getElementById('sp-err');
+  var btn=document.querySelector('#sp-verify-section .btn-navy');
   if(!name||!no){ err.style.display='block'; err.textContent='Por favor ingresa tu nombre y número de recibo.'; return; }
+
+  // First check local storage
   var found=receipts.find(function(r){ return r.no===no && r.patron.trim()===name; });
-  if(!found){
+  if(found){ err.style.display='none'; showWelcome(found); return; }
+
+  // If not found locally, query Google Sheets via Apps Script
+  if(!sheetsUrl){
     err.style.display='block';
     err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
     return;
   }
+
+  // Show loading state
+  btn.textContent='Verificando...';
+  btn.disabled=true;
   err.style.display='none';
-  showWelcome(found);
+
+  var queryUrl=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
+  fetch(queryUrl,{method:'GET',mode:'no-cors'})
+    .then(function(){
+      // no-cors means we can't read the response body
+      // So we do a JSONP-style approach: check sheets directly
+      return fetch(sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name));
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      btn.textContent='Verificar mi patrocinio →';
+      btn.disabled=false;
+      if(data.found){
+        var r={no:data.no,patron:data.patrocinador,lugar:data.lugar,dia:data.dia,mes:data.mes,anio:data.anio,monto:data.monto,letras:data.letras,plan:data.plan,obs:data.obs||''};
+        // Cache locally
+        var existing=receipts.find(function(x){ return x.no===r.no; });
+        if(!existing){ receipts.push(r); DB.set('receipts',receipts); }
+        err.style.display='none';
+        showWelcome(r);
+      } else {
+        err.style.display='block';
+        err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+      }
+    })
+    .catch(function(){
+      btn.textContent='Verificar mi patrocinio →';
+      btn.disabled=false;
+      err.style.display='block';
+      err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+    });
 }
 
 function showWelcome(r){
