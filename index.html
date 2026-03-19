@@ -859,87 +859,131 @@ nav{
           <li>En tu hoja de Sheets, ve a <strong>Extensiones → Apps Script</strong>.</li>
           <li>Borra todo el código existente y pega el siguiente:</li>
         </ul>
-        <div class="code-block">var SHEET_ID = '1UvrK3AC9fEbdwI1XO1yvLNXPwOY1JAnrvCkQRjWX3VQ';
+        <div class="code-block">var SHEET_ID  = '1UvrK3AC9fEbdwI1XO1yvLNXPwOY1JAnrvCkQRjWX3VQ';
 var FOLDER_ID = '1feN_k3g4mcE01Fl4Jm8Xa8iDHtwne4-K';
 
+// ── Cabeceras CORS (necesarias para fetch desde GitHub Pages) ──
+function setCORS(output) {
+  return output
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── Recibe datos del sistema (POST) ──
 function doPost(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
+    var type, no, fecha, lugar, patron, monto, letras, plan, obs;
 
-    if (data.type === 'receipt') {
-      var ss = SpreadsheetApp.openById(SHEET_ID);
-      var sheet = ss.getActiveSheet();
-      sheet.appendRow([
-        data.no, data.fecha, data.lugar,
-        data.patrocinador, data.monto,
-        data.letras, data.plan,
-        data.obs, new Date()
-      ]);
+    // Acepta tanto form-encoded como JSON
+    if (e.postData.type === 'application/x-www-form-urlencoded') {
+      var p = e.parameter;
+      type   = p.type;
+      no     = p.no;
+      fecha  = p.fecha;
+      lugar  = p.lugar;
+      patron = p.patrocinador;
+      monto  = p.monto;
+      letras = p.letras;
+      plan   = p.plan;
+      obs    = p.obs || '';
+    } else {
+      var d  = JSON.parse(e.postData.contents);
+      type   = d.type;
+      no     = d.no;
+      fecha  = d.fecha;
+      lugar  = d.lugar;
+      patron = d.patrocinador;
+      monto  = d.monto;
+      letras = d.letras;
+      plan   = d.plan;
+      obs    = d.obs || '';
     }
 
-    if (data.type === 'file') {
-      var folder = DriveApp.getFolderById(FOLDER_ID);
+    if (type === 'receipt') {
+      var ss    = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getActiveSheet();
+      // Fuerza el No. de recibo como texto para conservar los ceros: 001, 002…
+      var noTexto = String(no).padStart(3, '0');
+      sheet.appendRow([
+        noTexto, fecha, lugar,
+        patron, monto,
+        letras, plan,
+        obs, new Date()
+      ]);
+      // Formatea la celda del No. como texto para que no pierda los ceros
+      var lastRow = sheet.getLastRow();
+      sheet.getRange(lastRow, 1).setNumberFormat('@');
+    }
+
+    if (type === 'file') {
+      var folder  = DriveApp.getFolderById(FOLDER_ID);
       var sub;
-      var folders = folder.getFoldersByName(data.sponsor);
+      var folders = folder.getFoldersByName(patron || 'Sin_nombre');
       if (folders.hasNext()) { sub = folders.next(); }
-      else { sub = folder.createFolder(data.sponsor); }
+      else { sub = folder.createFolder(patron || 'Sin_nombre'); }
       var blob = Utilities.newBlob(
-        Utilities.base64Decode(data.content),
-        data.mimeType, data.filename
+        Utilities.base64Decode(e.parameter ? e.parameter.content : JSON.parse(e.postData.contents).content),
+        e.parameter ? e.parameter.mimeType : JSON.parse(e.postData.contents).mimeType,
+        e.parameter ? e.parameter.filename  : JSON.parse(e.postData.contents).filename
       );
       sub.createFile(blob);
     }
 
     return ContentService
-      .createTextOutput(JSON.stringify({ok: true}))
+      .createTextOutput(JSON.stringify({ ok: true }))
       .setMimeType(ContentService.MimeType.JSON);
 
-  } catch(err) {
+  } catch (err) {
     return ContentService
-      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// Permite verificar patrocinadores desde cualquier dispositivo
+// ── Verifica patrocinadores desde CUALQUIER dispositivo (GET) ──
 function doGet(e) {
   var action = e.parameter.action;
+
   if (action === 'verify') {
-    var no     = e.parameter.no;
-    var patron = e.parameter.patron;
+    var no     = String(e.parameter.no || '').trim().padStart(3, '0');
+    var patron = String(e.parameter.patron || '').trim();
     var ss     = SpreadsheetApp.openById(SHEET_ID);
     var sheet  = ss.getActiveSheet();
-    var data   = sheet.getDataRange().getValues();
-    // Row 0 = headers: No.Recibo|Fecha|Lugar|Patrocinador|MontoQ|EnLetras|Plan|Obs|Timestamp
-    for (var i = 1; i < data.length; i++) {
-      var row = data[i];
-      var rowNo     = String(row[0]).trim().padStart(3,'0');
-      var rowPatron = String(row[3]).trim();
-      if (rowNo === no && rowPatron === patron) {
-        var fecha = String(row[1]).split('/');
+    var rows   = sheet.getDataRange().getValues();
+
+    for (var i = 1; i < rows.length; i++) {
+      var row      = rows[i];
+      var rowNo    = String(row[0]).trim().padStart(3, '0');
+      var rowPat   = String(row[3]).trim();
+
+      if (rowNo === no && rowPat === patron) {
+        var partesFecha = String(row[1]).split('/');
+        var result = {
+          found:        true,
+          no:           rowNo,
+          fecha:        String(row[1]),
+          dia:          partesFecha[0] || '',
+          mes:          partesFecha[1] || '',
+          anio:         partesFecha[2] || '',
+          lugar:        String(row[2]),
+          patrocinador: rowPat,
+          monto:        String(row[4]),
+          letras:       String(row[5]),
+          plan:         String(row[6]).toLowerCase().trim(),
+          obs:          String(row[7] || '')
+        };
         return ContentService
-          .createTextOutput(JSON.stringify({
-            found: true,
-            no:          rowNo,
-            fecha:       row[1],
-            dia:         fecha[0]||'',
-            mes:         fecha[1]||'',
-            anio:        fecha[2]||'',
-            lugar:       row[2],
-            patrocinador:rowPatron,
-            monto:       row[4],
-            letras:      row[5],
-            plan:        row[6],
-            obs:         row[7]||''
-          }))
+          .createTextOutput(JSON.stringify(result))
           .setMimeType(ContentService.MimeType.JSON);
       }
     }
     return ContentService
-      .createTextOutput(JSON.stringify({found: false}))
+      .createTextOutput(JSON.stringify({ found: false }))
       .setMimeType(ContentService.MimeType.JSON);
   }
-  return ContentService.createTextOutput('IV Congreso API OK');
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'IV Congreso API OK' }))
+    .setMimeType(ContentService.MimeType.JSON);
 }</div>
         <p style="font-size:12px;color:var(--muted);margin-top:8px;">⚠ Reemplaza <code>TU_SHEET_ID_AQUI</code> y <code>TU_FOLDER_ID_AQUI</code> con tus IDs reales.</p>
       </div>
@@ -1520,21 +1564,20 @@ function updateStats(){
 // ══════════════════════════════════════════
 function sendToSheets(r){
   if(!sheetsUrl) return;
-  var payload={
-    type:'receipt',
-    no: r.no,
-    fecha: r.dia+'/'+r.mes+'/'+r.anio,
-    lugar: r.lugar,
-    patrocinador: r.patron,
-    monto: r.monto,
-    letras: r.letras,
-    plan: r.plan,
-    obs: r.obs||''
-  };
+  // Use form-encoded POST to avoid CORS preflight – Apps Script handles both
+  var params=new URLSearchParams();
+  params.append('type','receipt');
+  params.append('no',     String(r.no));
+  params.append('fecha',  r.dia+'/'+r.mes+'/'+r.anio);
+  params.append('lugar',  r.lugar);
+  params.append('patrocinador', r.patron);
+  params.append('monto',  'Q'+parseFloat(r.monto).toFixed(2));
+  params.append('letras', r.letras);
+  params.append('plan',   r.plan);
+  params.append('obs',    r.obs||'');
   fetch(sheetsUrl,{
     method:'POST',mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
+    body:params
   }).catch(function(){});
 }
 
@@ -1552,41 +1595,54 @@ function sendFileToDrive(sponsor,filename,base64content,mimeType){
 // ══════════════════════════════════════════
 function verifySponsor(){
   var name=document.getElementById('sp-name').value.trim();
-  var no=document.getElementById('sp-recibo').value.trim().padStart(3,'0');
+  var rawNo=document.getElementById('sp-recibo').value.trim();
+  var no=rawNo.padStart(3,'0');
   var err=document.getElementById('sp-err');
   var btn=document.querySelector('#sp-verify-section .btn-navy');
-  if(!name||!no){ err.style.display='block'; err.textContent='Por favor ingresa tu nombre y número de recibo.'; return; }
+  if(!name||!rawNo){ err.style.display='block'; err.textContent='Por favor ingresa tu nombre y número de recibo.'; return; }
 
-  // First check local storage
+  // 1) Check local cache first (same device / same browser)
   var found=receipts.find(function(r){ return r.no===no && r.patron.trim()===name; });
   if(found){ err.style.display='none'; showWelcome(found); return; }
 
-  // If not found locally, query Google Sheets via Apps Script
+  // 2) Not in local cache → query Google Sheets (works from ANY device)
   if(!sheetsUrl){
     err.style.display='block';
-    err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+    err.textContent='No se encontró el patrocinio. Si acabas de registrarte, contacta a tesorería.';
     return;
   }
 
-  // Show loading state
   btn.textContent='Verificando...';
   btn.disabled=true;
   err.style.display='none';
 
-  var queryUrl=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
-  fetch(queryUrl,{method:'GET',mode:'no-cors'})
-    .then(function(){
-      // no-cors means we can't read the response body
-      // So we do a JSONP-style approach: check sheets directly
-      return fetch(sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name));
+  // doGet on Apps Script – no CORS issue because it's a simple GET with no custom headers
+  var url=sheetsUrl
+    +'?action=verify'
+    +'&no='+encodeURIComponent(no)
+    +'&patron='+encodeURIComponent(name);
+
+  fetch(url)
+    .then(function(res){
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.json();
     })
-    .then(function(res){ return res.json(); })
     .then(function(data){
       btn.textContent='Verificar mi patrocinio →';
       btn.disabled=false;
       if(data.found){
-        var r={no:data.no,patron:data.patrocinador,lugar:data.lugar,dia:data.dia,mes:data.mes,anio:data.anio,monto:data.monto,letras:data.letras,plan:data.plan,obs:data.obs||''};
-        // Cache locally
+        var r={
+          no:     data.no,
+          patron: data.patrocinador,
+          lugar:  data.lugar||'',
+          dia:    data.dia||'',
+          mes:    data.mes||'',
+          anio:   data.anio||'',
+          monto:  data.monto||'',
+          letras: data.letras||'',
+          plan:   data.plan||'basico',
+          obs:    data.obs||''
+        };
         var existing=receipts.find(function(x){ return x.no===r.no; });
         if(!existing){ receipts.push(r); DB.set('receipts',receipts); }
         err.style.display='none';
@@ -1596,11 +1652,11 @@ function verifySponsor(){
         err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
       }
     })
-    .catch(function(){
+    .catch(function(e){
       btn.textContent='Verificar mi patrocinio →';
       btn.disabled=false;
       err.style.display='block';
-      err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+      err.textContent='Error de conexión con el servidor. Intenta de nuevo en unos segundos.';
     });
 }
 
