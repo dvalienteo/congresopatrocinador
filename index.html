@@ -862,18 +862,10 @@ nav{
         <div class="code-block">var SHEET_ID  = '1UvrK3AC9fEbdwI1XO1yvLNXPwOY1JAnrvCkQRjWX3VQ';
 var FOLDER_ID = '1feN_k3g4mcE01Fl4Jm8Xa8iDHtwne4-K';
 
-// ── Cabeceras CORS (necesarias para fetch desde GitHub Pages) ──
-function setCORS(output) {
-  return output
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-// ── Recibe datos del sistema (POST) ──
 function doPost(e) {
   try {
     var type, no, fecha, lugar, patron, monto, letras, plan, obs;
 
-    // Acepta tanto form-encoded como JSON
     if (e.postData.type === 'application/x-www-form-urlencoded') {
       var p = e.parameter;
       type   = p.type;
@@ -887,44 +879,47 @@ function doPost(e) {
       obs    = p.obs || '';
     } else {
       var d  = JSON.parse(e.postData.contents);
-      type   = d.type;
-      no     = d.no;
-      fecha  = d.fecha;
-      lugar  = d.lugar;
-      patron = d.patrocinador;
-      monto  = d.monto;
-      letras = d.letras;
-      plan   = d.plan;
+      type   = d.type;   no = d.no;
+      fecha  = d.fecha;  lugar  = d.lugar;
+      patron = d.patrocinador; monto = d.monto;
+      letras = d.letras; plan   = d.plan;
       obs    = d.obs || '';
     }
 
+    // ── Guardar recibo ──
     if (type === 'receipt') {
       var ss    = SpreadsheetApp.openById(SHEET_ID);
       var sheet = ss.getActiveSheet();
-      // Fuerza el No. de recibo como texto para conservar los ceros: 001, 002…
-      var noTexto = String(no).padStart(3, '0');
-      sheet.appendRow([
-        noTexto, fecha, lugar,
-        patron, monto,
-        letras, plan,
-        obs, new Date()
-      ]);
-      // Formatea la celda del No. como texto para que no pierda los ceros
-      var lastRow = sheet.getLastRow();
-      sheet.getRange(lastRow, 1).setNumberFormat('@');
+      var noTxt = String(no).padStart(3, '0');
+      sheet.appendRow([noTxt, fecha, lugar, patron, monto, letras, plan, obs, new Date()]);
+      var last = sheet.getLastRow();
+      sheet.getRange(last, 1).setNumberFormat('@');
+      sheet.getRange(last, 5).setNumberFormat('@');
     }
 
+    // ── Eliminar recibo ──
+    if (type === 'delete') {
+      var ss2    = SpreadsheetApp.openById(SHEET_ID);
+      var sheet2 = ss2.getActiveSheet();
+      var rows2  = sheet2.getDataRange().getValues();
+      var noFind = String(no).padStart(3, '0');
+      for (var i = rows2.length - 1; i >= 1; i--) {
+        if (String(rows2[i][0]).trim().padStart(3,'0') === noFind) {
+          sheet2.deleteRow(i + 1);
+          break;
+        }
+      }
+    }
+
+    // ── Guardar archivo en Drive ──
     if (type === 'file') {
       var folder  = DriveApp.getFolderById(FOLDER_ID);
       var sub;
-      var folders = folder.getFoldersByName(patron || 'Sin_nombre');
-      if (folders.hasNext()) { sub = folders.next(); }
-      else { sub = folder.createFolder(patron || 'Sin_nombre'); }
-      var blob = Utilities.newBlob(
-        Utilities.base64Decode(e.parameter ? e.parameter.content : JSON.parse(e.postData.contents).content),
-        e.parameter ? e.parameter.mimeType : JSON.parse(e.postData.contents).mimeType,
-        e.parameter ? e.parameter.filename  : JSON.parse(e.postData.contents).filename
-      );
+      var nm      = patron || 'Sin_nombre';
+      var fols    = folder.getFoldersByName(nm);
+      sub = fols.hasNext() ? fols.next() : folder.createFolder(nm);
+      var fd  = (e.postData.type === 'application/x-www-form-urlencoded') ? e.parameter : JSON.parse(e.postData.contents);
+      var blob = Utilities.newBlob(Utilities.base64Decode(fd.content), fd.mimeType, fd.filename);
       sub.createFile(blob);
     }
 
@@ -939,7 +934,7 @@ function doPost(e) {
   }
 }
 
-// ── Verifica patrocinadores desde CUALQUIER dispositivo (GET) ──
+// ── Verificar patrocinador desde cualquier dispositivo ──
 function doGet(e) {
   var action = e.parameter.action;
 
@@ -951,28 +946,24 @@ function doGet(e) {
     var rows   = sheet.getDataRange().getValues();
 
     for (var i = 1; i < rows.length; i++) {
-      var row      = rows[i];
-      var rowNo    = String(row[0]).trim().padStart(3, '0');
-      var rowPat   = String(row[3]).trim();
+      var row    = rows[i];
+      var rowNo  = String(row[0]).trim().padStart(3, '0');
+      var rowPat = String(row[3]).trim();
 
       if (rowNo === no && rowPat === patron) {
-        var partesFecha = String(row[1]).split('/');
-        var result = {
-          found:        true,
-          no:           rowNo,
-          fecha:        String(row[1]),
-          dia:          partesFecha[0] || '',
-          mes:          partesFecha[1] || '',
-          anio:         partesFecha[2] || '',
-          lugar:        String(row[2]),
-          patrocinador: rowPat,
-          monto:        String(row[4]),
-          letras:       String(row[5]),
-          plan:         String(row[6]).toLowerCase().trim(),
-          obs:          String(row[7] || '')
-        };
+        var f = String(row[1]).split('/');
         return ContentService
-          .createTextOutput(JSON.stringify(result))
+          .createTextOutput(JSON.stringify({
+            found: true, no: rowNo,
+            fecha: String(row[1]),
+            dia: f[0]||'', mes: f[1]||'', anio: f[2]||'',
+            lugar: String(row[2]),
+            patrocinador: rowPat,
+            monto: String(row[4]),
+            letras: String(row[5]),
+            plan: String(row[6]).toLowerCase().trim(),
+            obs: String(row[7]||'')
+          }))
           .setMimeType(ContentService.MimeType.JSON);
       }
     }
@@ -1527,15 +1518,18 @@ function renderReceiptsList(){
   document.getElementById('list-count-badge').textContent=receipts.length+' registro'+(receipts.length!==1?'s':'');
   if(!receipts.length){ el.innerHTML='<div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>'; return; }
   el.innerHTML=[...receipts].reverse().map(r=>`
-    <div class="ri" onclick="viewReceipt('${r.no}')">
-      <div class="ri-no">No.${r.no}</div>
-      <div style="flex:1;min-width:0;">
+    <div class="ri">
+      <div class="ri-no" onclick="viewReceipt('${r.no}')" style="cursor:pointer;">No.${r.no}</div>
+      <div style="flex:1;min-width:0;cursor:pointer;" onclick="viewReceipt('${r.no}')">
         <div class="ri-name">${r.patron}</div>
         <div class="ri-meta">${r.dia}/${r.mes}/${r.anio} &nbsp;·&nbsp;
           <span class="badge ${r.plan==='basico'?'badge-basic':'badge-premium'}">${r.plan.toUpperCase()}</span>
         </div>
       </div>
-      <div class="ri-amount">Q ${parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="ri-amount">Q ${parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteReceipt('${r.no}')" title="Eliminar recibo" style="flex-shrink:0;">🗑</button>
+      </div>
     </div>
   `).join('');
 }
@@ -1557,6 +1551,32 @@ function updateStats(){
   document.getElementById('st-prem').textContent=prem.length;
   document.getElementById('st-total-q').textContent='Q '+total.toLocaleString('es-GT',{minimumFractionDigits:2});
   document.getElementById('st-last').textContent=receipts.length?'No.'+receipts[receipts.length-1].no:'—';
+}
+
+// ══════════════════════════════════════════
+// DELETE RECEIPT
+// ══════════════════════════════════════════
+function confirmDeleteReceipt(no){
+  var r=receipts.find(function(x){return x.no===no;});
+  if(!r) return;
+  if(!confirm('¿Eliminar el recibo No.'+no+' de "'+r.patron+'"?\n\nEsta acción también lo eliminará de Google Sheets.')) return;
+  deleteReceipt(no);
+}
+
+function deleteReceipt(no){
+  // Remove from local array
+  receipts=receipts.filter(function(r){return r.no!==no;});
+  DB.set('receipts',receipts);
+  // Remove from Google Sheets
+  if(sheetsUrl){
+    var params=new URLSearchParams();
+    params.append('type','delete');
+    params.append('no', no);
+    fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:params}).catch(function(){});
+  }
+  renderReceiptsList();
+  updateStats();
+  showToast('🗑 Recibo No.'+no+' eliminado correctamente.');
 }
 
 // ══════════════════════════════════════════
@@ -1599,16 +1619,16 @@ function verifySponsor(){
   var no=rawNo.padStart(3,'0');
   var err=document.getElementById('sp-err');
   var btn=document.querySelector('#sp-verify-section .btn-navy');
-  if(!name||!rawNo){ err.style.display='block'; err.textContent='Por favor ingresa tu nombre y número de recibo.'; return; }
+  if(!name||!rawNo){err.style.display='block';err.textContent='Por favor ingresa tu nombre y número de recibo.';return;}
 
-  // 1) Check local cache first (same device / same browser)
-  var found=receipts.find(function(r){ return r.no===no && r.patron.trim()===name; });
-  if(found){ err.style.display='none'; showWelcome(found); return; }
+  // 1) Check local cache first
+  var found=receipts.find(function(r){return r.no===no&&r.patron.trim()===name;});
+  if(found){err.style.display='none';showWelcome(found);return;}
 
-  // 2) Not in local cache → query Google Sheets (works from ANY device)
+  // 2) Query Google Sheets via Apps Script (any device)
   if(!sheetsUrl){
     err.style.display='block';
-    err.textContent='No se encontró el patrocinio. Si acabas de registrarte, contacta a tesorería.';
+    err.textContent='No se encontró el patrocinio. Contacta a tesorería para verificar tu registro.';
     return;
   }
 
@@ -1616,48 +1636,80 @@ function verifySponsor(){
   btn.disabled=true;
   err.style.display='none';
 
-  // doGet on Apps Script – no CORS issue because it's a simple GET with no custom headers
-  var url=sheetsUrl
-    +'?action=verify'
-    +'&no='+encodeURIComponent(no)
-    +'&patron='+encodeURIComponent(name);
+  // Apps Script doGet returns JSON with CORS headers when deployed as "Anyone"
+  // We use a script tag injection (JSONP-style) to bypass any remaining CORS issues
+  var cbName='_iv4cb_'+Date.now();
+  var script=document.createElement('script');
+  var timeout=setTimeout(function(){
+    // Fallback: try plain fetch if JSONP fails
+    script.remove();
+    delete window[cbName];
+    var url=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
+    fetch(url,{method:'GET',headers:{'Accept':'application/json'}})
+      .then(function(res){return res.json();})
+      .then(function(data){handleVerifyResponse(data,name,no,btn,err);})
+      .catch(function(){
+        btn.textContent='Verificar mi patrocinio →';
+        btn.disabled=false;
+        err.style.display='block';
+        err.textContent='Error de conexión. Verifica tu internet e intenta de nuevo.';
+      });
+  },8000);
 
+  window[cbName]=function(data){
+    clearTimeout(timeout);
+    script.remove();
+    delete window[cbName];
+    handleVerifyResponse(data,name,no,btn,err);
+  };
+
+  // Try plain fetch first — works when CORS is properly configured
+  var url=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
   fetch(url)
     .then(function(res){
+      clearTimeout(timeout);
+      script.remove();
+      delete window[cbName];
       if(!res.ok) throw new Error('HTTP '+res.status);
       return res.json();
     })
-    .then(function(data){
-      btn.textContent='Verificar mi patrocinio →';
-      btn.disabled=false;
-      if(data.found){
-        var r={
-          no:     data.no,
-          patron: data.patrocinador,
-          lugar:  data.lugar||'',
-          dia:    data.dia||'',
-          mes:    data.mes||'',
-          anio:   data.anio||'',
-          monto:  data.monto||'',
-          letras: data.letras||'',
-          plan:   data.plan||'basico',
-          obs:    data.obs||''
-        };
-        var existing=receipts.find(function(x){ return x.no===r.no; });
-        if(!existing){ receipts.push(r); DB.set('receipts',receipts); }
-        err.style.display='none';
-        showWelcome(r);
-      } else {
-        err.style.display='block';
-        err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
-      }
-    })
-    .catch(function(e){
+    .then(function(data){handleVerifyResponse(data,name,no,btn,err);})
+    .catch(function(){
+      // fetch failed, wait for JSONP timeout fallback or try again
+      clearTimeout(timeout);
+      script.remove();
+      delete window[cbName];
       btn.textContent='Verificar mi patrocinio →';
       btn.disabled=false;
       err.style.display='block';
-      err.textContent='Error de conexión con el servidor. Intenta de nuevo en unos segundos.';
+      err.textContent='No se pudo conectar con el servidor. Verifica tu URL de Google en configuración.';
     });
+}
+
+function handleVerifyResponse(data,name,no,btn,err){
+  btn.textContent='Verificar mi patrocinio →';
+  btn.disabled=false;
+  if(data&&data.found){
+    var r={
+      no:     data.no||no,
+      patron: data.patrocinador||name,
+      lugar:  data.lugar||'',
+      dia:    data.dia||'',
+      mes:    data.mes||'',
+      anio:   data.anio||'',
+      monto:  String(data.monto||''),
+      letras: data.letras||'',
+      plan:   (data.plan||'basico').toLowerCase().trim(),
+      obs:    data.obs||''
+    };
+    var existing=receipts.find(function(x){return x.no===r.no;});
+    if(!existing){receipts.push(r);DB.set('receipts',receipts);}
+    err.style.display='none';
+    showWelcome(r);
+  } else {
+    err.style.display='block';
+    err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+  }
 }
 
 function showWelcome(r){
