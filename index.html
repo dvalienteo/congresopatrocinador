@@ -1037,7 +1037,9 @@ var currentReceipt = null;
 var selectedPlan = 'basico';
 var logoFile = null;
 var photoFiles = [];
-var sheetsUrl = DB.get('sheets_url','');
+// URL hardcodeada — funciona en TODOS los dispositivos sin configuración
+var SHEETS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbwpryvkJk-lVGe1Nay01Mu2THQcBeAYvOnrI4qNK112_34mJ-cZt2Ro8o51EE5G8nOR0g/exec';
+var sheetsUrl = DB.get('sheets_url','') || SHEETS_URL_DEFAULT;
 
 // ══════════════════════════════════════════
 // TABS
@@ -1240,7 +1242,7 @@ function saveGoogleUrl(){
   DB.set('sheets_url',url);
   document.getElementById('guide-save-msg').style.display='block';
   updateSheetsStatus();
-  showToast('✓ URL de Google guardada correctamente.');
+  showToast('✓ URL de Google guardada. Actualiza el código HTML con la nueva URL para que funcione en todos los dispositivos.');
 }
 
 function updateSheetsStatus(){
