@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IV Congreso Ingeniería Industrial — Puerto Barrios</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange:#E8580A;
+  --orange2:#FF8C00;
+  --navy:#0D1F3C;
+  --navy2:#162B52;
+  --navy3:#1E3A6E;
+  --gold:#F5A623;
+  --white:#FFFFFF;
+  --bg:#F0F2F7;
+  --border:#D1D8E8;
+  --text:#0D1F3C;
+  --muted:#6B7A99;
+  --success:#1A7F5A;
+  --success-bg:#D4EDDA;
+  --danger:#C0392B;
+  --danger-bg:#FDECEA;
+  --font:'Barlow',sans-serif;
+  --display:'Barlow Condensed',sans-serif;
+  --radius:10px;
+  --radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
+a{color:inherit;text-decoration:none;}
+
+/* ── NAV ── */
+nav{
+  background:var(--navy);
+  display:flex;align-items:stretch;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 3px 20px rgba(13,31,60,.35);
+}
+.nav-brand{
+  display:flex;align-items:center;gap:14px;
+  padding:0 30px 0 22px;
+  border-right:1px solid rgba(255,255,255,.1);
+  flex-shrink:0;
+}
+.nav-logo-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.nav-brand-text{line-height:1.15;}
+.nav-brand-text b{display:block;font-family:var(--display);font-size:17px;color:var(--gold);letter-spacing:.5px;font-weight:900;}
+.nav-brand-text small{display:block;font-size:9px;color:rgba(255,255,255,.45);letter-spacing:2.5px;text-transform:uppercase;margin-top:1px;}
+.nav-tabs{display:flex;flex:1;}
+.nav-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:0 20px;cursor:pointer;
+  font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.45);
+  border-bottom:3px solid transparent;
+  transition:all .2s;min-height:62px;
+}
+.nav-tab:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.04);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.nav-tab .ti{font-size:18px;}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── LOGIN ── */
+.login-page{
+  min-height:calc(100vh - 62px);
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,var(--navy) 0%,var(--navy3) 100%);
+  padding:40px 20px;
+  position:relative;overflow:hidden;
+}
+.login-page::before{
+  content:'⚙';position:absolute;font-size:500px;
+  color:rgba(255,255,255,.025);top:-120px;right:-100px;
+  line-height:1;pointer-events:none;
+}
+.login-card{
+  background:var(--white);border-radius:var(--radius-lg);
+  padding:48px 44px;width:100%;max-width:440px;
+  box-shadow:0 30px 80px rgba(0,0,0,.3);
+  position:relative;
+}
+.login-header{text-align:center;margin-bottom:36px;}
+.login-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--orange);margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+}
+.login-header h2{font-family:var(--display);font-size:28px;font-weight:900;color:var(--navy);letter-spacing:.5px;}
+.login-header p{font-size:13px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1.5px;}
+
+/* ── FORMS ── */
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:7px;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:var(--radius);
+  font-family:var(--font);font-size:15px;color:var(--text);
+  background:var(--white);outline:none;transition:border .18s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--orange);}
+.fg input[readonly]{background:#F8F9FC;color:var(--muted);}
+.fg textarea{resize:vertical;min-height:60px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row4{display:grid;grid-template-columns:2.5fr 1fr 1fr 1.2fr;gap:10px;}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 22px;border:none;border-radius:var(--radius);cursor:pointer;
+  font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;transition:all .2s;white-space:nowrap;
+}
+.btn-block{width:100%;}
+.btn-primary{background:var(--orange);color:#fff;}
+.btn-primary:hover{background:#C94708;transform:translateY(-1px);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:var(--navy2);}
+.btn-outline{background:transparent;color:var(--orange);border:2px solid var(--orange);}
+.btn-outline:hover{background:var(--orange);color:#fff;}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.btn-ghost:hover{background:rgba(255,255,255,.2);}
+.btn-sm{padding:8px 14px;font-size:13px;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+
+/* ── ALERTS ── */
+.alert{border-radius:var(--radius);padding:12px 16px;font-size:14px;margin-bottom:16px;}
+.alert-danger{background:var(--danger-bg);color:var(--danger);}
+.alert-success{background:var(--success-bg);color:var(--success);}
+.alert-info{background:#E8F0FE;color:#1A56A0;}
+
+/* ── PAGE HEADER ── */
+.pg-header{
+  background:var(--navy);padding:28px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.pg-header-left h1{font-family:var(--display);font-size:30px;font-weight:900;color:var(--gold);letter-spacing:.5px;}
+.pg-header-left p{font-size:13px;color:rgba(255,255,255,.5);margin-top:3px;text-transform:uppercase;letter-spacing:1px;}
+.pg-header-actions{display:flex;gap:10px;align-items:center;}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:0;
+}
+.stat-item{
+  padding:18px 24px;border-right:1px solid var(--border);
+}
+.stat-item:last-child{border-right:none;}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:5px;}
+.stat-val{font-family:var(--display);font-size:28px;font-weight:900;color:var(--navy);}
+.stat-val.c-orange{color:var(--orange);}
+.stat-val.c-gold{color:var(--gold);}
+.stat-val.c-success{color:var(--success);}
+
+/* ── CONTENT GRID ── */
+.content-grid{
+  display:grid;grid-template-columns:440px 1fr;
+  gap:28px;padding:28px 40px;align-items:start;
+}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.card-header{
+  padding:18px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.card-header h3{font-family:var(--display);font-size:18px;font-weight:800;color:var(--navy);letter-spacing:.3px;}
+.card-body{padding:24px;}
+
+/* ── BADGE ── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+.badge-orange{background:var(--orange);color:#fff;}
+.badge-basic{background:#EEF2FF;color:#3730A3;}
+.badge-premium{background:#FEF3C7;color:#92400E;}
+.badge-admin{background:#FCE8E8;color:#911;}
+.badge-navy{background:var(--navy);color:#fff;}
+
+/* ── PLAN SELECTOR ── */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.plan-opt{
+  border:2px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;cursor:pointer;transition:all .2s;position:relative;
+}
+.plan-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.plan-opt:hover{border-color:var(--orange);}
+.plan-opt.sel{border-color:var(--orange);background:#FFF5EF;}
+.plan-opt-name{font-family:var(--display);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.plan-opt-price{font-size:20px;font-weight:700;color:var(--orange);font-family:var(--display);}
+.plan-opt-price small{font-size:12px;color:var(--muted);font-family:var(--font);font-weight:400;}
+
+/* ── RECEIPTS LIST ── */
+.receipts-list{max-height:520px;overflow-y:auto;}
+.ri{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;gap:12px;
+}
+.ri:hover{background:var(--bg);}
+.ri:last-child{border-bottom:none;}
+.ri-no{font-family:var(--display);font-size:20px;font-weight:900;color:var(--orange);min-width:52px;}
+.ri-name{font-size:14px;font-weight:700;color:var(--navy);}
+.ri-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.ri-amount{font-family:var(--display);font-size:18px;font-weight:800;color:var(--navy);text-align:right;white-space:nowrap;}
+.empty-state{padding:56px 24px;text-align:center;color:var(--muted);font-size:14px;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,20,45,.65);z-index:1000;
+  align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--white);border-radius:var(--radius-lg);
+  width:100%;max-height:93vh;overflow-y:auto;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+}
+.modal-sm{max-width:480px;}
+.modal-md{max-width:680px;}
+.modal-lg{max-width:820px;}
+.modal-header{
+  padding:20px 28px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:2;
+}
+.modal-header h3{font-family:var(--display);font-size:20px;font-weight:800;color:var(--navy);}
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:0 4px;}
+.modal-body{padding:28px;}
+.modal-footer{padding:0 28px 28px;display:flex;gap:12px;justify-content:flex-end;}
+
+/* ── RECEIPT DOCUMENT ── */
+.rdoc{
+  font-family:Arial,Helvetica,sans-serif;
+  border:1px solid #ccc;border-radius:8px;overflow:hidden;
+  font-size:12px;color:#111;
+}
+.rdoc-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:2px solid #111;
+  gap:20px;
+}
+.rdoc-brand{display:flex;align-items:center;gap:12px;}
+.rdoc-gear{font-size:52px;line-height:1;color:#E8580A;}
+.rdoc-brand-text h2{
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:24px;font-weight:900;color:#E8580A;
+  letter-spacing:.5px;line-height:1.1;text-transform:uppercase;
+}
+.rdoc-brand-text p{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:2px;}
+.rdoc-no-box{text-align:right;}
+.rdoc-no-label{
+  background:#888;color:#fff;
+  font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  padding:6px 18px;border-radius:4px;display:inline-block;margin-bottom:6px;
+}
+.rdoc-no-val{
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:36px;font-weight:900;color:#0D1F3C;
+  letter-spacing:2px;line-height:1;display:block;
+}
+.rdoc-table{width:100%;border-collapse:collapse;}
+.rdoc-table td{border:1px solid #bbb;padding:8px 12px;font-size:12px;vertical-align:middle;}
+.rdoc-th{background:#E8E8E8;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;color:#444;}
+.rdoc-amount-row{padding:12px 20px;border-bottom:1px solid #ccc;}
+.rdoc-amount-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:4px;}
+.rdoc-amount-val{
+  font-size:15px;font-weight:700;color:#0D1F3C;
+  border:1.5px solid #0D1F3C;border-radius:4px;
+  padding:8px 14px;min-height:56px;
+}
+.rdoc-concept{padding:14px 20px;border-bottom:1px solid #ccc;}
+.rdoc-concept-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:10px;}
+.rdoc-plans{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.rdoc-plan{border:1.5px solid #bbb;border-radius:6px;padding:12px 14px;}
+.rdoc-plan.active{border-color:#E8580A;background:#FFF5EF;}
+.rdoc-plan-title{
+  font-family:'Barlow Condensed',Arial,sans-serif;
+  font-size:16px;font-weight:900;color:#0D1F3C;
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.rdoc-plan-circle{
+  width:18px;height:18px;border-radius:50%;border:2px solid;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rdoc-plan-circle.filled{background:#E8580A;border-color:#E8580A;}
+.rdoc-plan-circle.empty{border-color:#bbb;}
+.rdoc-plan ul{font-size:10.5px;padding-left:16px;line-height:1.75;color:#333;}
+.rdoc-footer{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:12px 20px;border-top:1px solid #ccc;
+}
+.rdoc-footer-note{font-size:10px;color:#666;max-width:320px;line-height:1.5;}
+.rdoc-footer-copies{text-align:right;font-size:10px;font-weight:700;line-height:1.8;}
+.rdoc-footer-copies .orig{color:#E8580A;}
+.rdoc-footer-copies .dupl{color:#0D1F3C;}
+
+/* ── SPONSOR PAGE ── */
+.sponsor-hero{
+  background:var(--navy);
+  padding:56px 40px 48px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.sponsor-hero::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.012) 40px,rgba(255,255,255,.012) 80px);
+}
+.sponsor-hero-icon{
+  font-size:52px;margin-bottom:12px;display:block;
+  animation:spin-slow 20s linear infinite;
+}
+@keyframes spin-slow{to{transform:rotate(360deg);}}
+.sponsor-hero h1{
+  font-family:var(--display);font-size:48px;font-weight:900;
+  color:var(--gold);letter-spacing:2px;line-height:1;margin-bottom:6px;
+}
+.sponsor-hero h2{
+  font-family:var(--display);font-size:22px;font-weight:600;
+  color:rgba(255,255,255,.65);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;
+}
+.sponsor-hero p{font-size:15px;color:rgba(255,255,255,.5);max-width:480px;margin:0 auto;}
+.sponsor-wrap{max-width:640px;margin:0 auto;padding:40px 24px;}
+
+/* ── VERIFY CARD ── */
+.verify-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
+
+/* ── WELCOME ── */
+.welcome-section{display:none;}
+.welcome-section.show{display:block;}
+.welcome-banner{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);
+  border-radius:var(--radius-lg);padding:36px 32px;text-align:center;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.welcome-banner::after{
+  content:'✓';position:absolute;font-size:160px;color:rgba(255,255,255,.03);
+  right:-20px;top:-30px;line-height:1;
+}
+.welcome-check{
+  width:64px;height:64px;border-radius:50%;background:var(--success);
+  margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:#fff;
+}
+.welcome-banner h2{font-family:var(--display);font-size:32px;font-weight:900;color:var(--gold);letter-spacing:.5px;margin-bottom:6px;}
+.welcome-banner p{color:rgba(255,255,255,.7);font-size:15px;}
+.welcome-banner .receipt-tag{
+  display:inline-block;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);
+  border-radius:6px;padding:5px 14px;font-size:13px;font-weight:600;margin-top:12px;
+}
+
+/* ── PLAN INFO ── */
+.plan-info-box{
+  background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);
+  padding:24px;margin-bottom:24px;
+}
+.plan-info-box h3{
+  font-family:var(--display);font-size:20px;font-weight:800;color:var(--navy);
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.plan-info-box ul{list-style:none;}
+.plan-info-box li{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:7px 0;font-size:14px;color:var(--text);
+  border-bottom:1px solid var(--border);
+}
+.plan-info-box li:last-child{border-bottom:none;}
+.plan-check{color:var(--orange);font-weight:900;font-size:15px;flex-shrink:0;margin-top:1px;}
+
+/* ── UPLOAD ── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--radius-lg);
+  padding:30px 20px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;background:var(--bg);
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--orange);background:#FFF5EF;}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone-icon{font-size:36px;margin-bottom:10px;}
+.upload-zone h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.upload-zone p{font-size:12px;color:var(--muted);}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px;}
+.preview-thumb{
+  aspect-ratio:1;border-radius:var(--radius);overflow:hidden;
+  border:1.5px solid var(--border);background:var(--bg);position:relative;
+}
+.preview-thumb img{width:100%;height:100%;object-fit:cover;}
+.preview-thumb .remove-btn{
+  position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
+  background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+
+/* ── USER MANAGER ── */
+.user-table{width:100%;border-collapse:collapse;}
+.user-table th,.user-table td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--border);font-size:14px;}
+.user-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:var(--bg);}
+.user-table tr:last-child td{border-bottom:none;}
+.user-table .user-actions{display:flex;gap:8px;}
+
+/* ── GUIDE ── */
+.guide-step{
+  background:var(--bg);border-radius:var(--radius);
+  padding:16px 20px;margin-bottom:14px;border-left:4px solid var(--orange);
+}
+.guide-step h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.guide-step p,.guide-step li{font-size:13px;color:var(--text);line-height:1.7;}
+.guide-step ul{padding-left:18px;}
+.code-block{
+  background:var(--navy);color:#A8D8FF;border-radius:8px;
+  padding:14px 16px;font-family:monospace;font-size:11.5px;
+  white-space:pre-wrap;line-height:1.6;margin-top:10px;overflow-x:auto;
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--navy);color:#fff;
+  padding:14px 22px;border-radius:var(--radius);
+  font-size:14px;font-weight:600;z-index:9999;
+  transform:translateY(90px);opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;max-width:340px;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .content-grid{grid-template-columns:1fr;padding:20px;}
+  .pg-header{padding:20px;}
+  .row4{grid-template-columns:1fr 1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  .nav-brand{display:none;}
+  .plan-grid{grid-template-columns:1fr;}
+  .rdoc-plans{grid-template-columns:1fr;}
+  .row2,.row4{grid-template-columns:1fr;}
+  .sponsor-hero{padding:36px 20px 30px;}
+  .sponsor-hero h1{font-size:36px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ NAV ════════════════════ -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo-circle">⚙</div>
+    <div class="nav-brand-text">
+      <b>IV Congreso</b>
+      <small>Ingeniería Industrial · Puerto Barrios</small>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab" id="tab-treasury" onclick="showTab('treasury')">
+      <span class="ti">🏦</span> Tesorería
+    </div>
+    <div class="nav-tab active" id="tab-sponsor" onclick="showTab('sponsor')">
+      <span class="ti">🤝</span> Portal del Patrocinador
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════ TREASURY PAGE ════════════════════ -->
+<div class="page" id="page-treasury">
+
+  <!-- LOGIN -->
+  <div class="login-page" id="treasury-login">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">🏦</div>
+        <h2>Tesorería</h2>
+        <p>IV Congreso · Puerto Barrios</p>
+      </div>
+      <div id="login-err" class="alert alert-danger" style="display:none;"></div>
+      <div class="fg">
+        <label>Usuario</label>
+        <input type="text" id="lu" placeholder="tu usuario" autocomplete="username">
+      </div>
+      <div class="fg">
+        <label>Contraseña</label>
+        <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Ingresar al sistema →</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="treasury-dash" style="display:none;">
+
+    <div class="pg-header">
+      <div class="pg-header-left">
+        <h1>📋 Módulo de Tesorería</h1>
+        <p id="dash-user-label">IV Congreso de Ingeniería Industrial · Puerto Barrios</p>
+      </div>
+      <div class="pg-header-actions">
+        <span id="admin-btns" style="display:none;gap:10px;display:none;">
+          <button class="btn btn-ghost btn-sm" onclick="openUserMgr()">👥 Gestionar usuarios</button>
+          <button class="btn btn-ghost btn-sm" onclick="openGuide()">📖 Guía Google</button>
+        </span>
+        <button class="btn btn-ghost btn-sm" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">Total patrocinadores</div>
+        <div class="stat-val" id="st-total">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Plan Básico</div>
+        <div class="stat-val c-orange" id="st-basic">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Plan Premium</div>
+        <div class="stat-val c-gold" id="st-prem">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Ingresos totales</div>
+        <div class="stat-val c-success" id="st-total-q">Q0.00</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Último recibo</div>
+        <div class="stat-val" id="st-last">—</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- FORM -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Nuevo Recibo</h3>
+            <span class="badge badge-orange" id="next-no-badge">No. 001</span>
+          </div>
+          <div class="card-body">
+
+            <div class="alert alert-info" id="sheets-status-msg" style="font-size:13px;">
+              📊 Google Sheets: <strong id="sheets-state-txt">No configurado</strong>
+              <span id="admin-sheets-btn" style="display:none;">
+                — <a href="#" onclick="openGuide()" style="color:inherit;font-weight:700;text-decoration:underline;">Configurar →</a>
+              </span>
+            </div>
+
+            <div class="row4" style="margin-bottom:16px;">
+              <div class="fg" style="margin-bottom:0;">
+                <label>Lugar</label>
+                <input type="text" id="f-lugar" value="Puerto Barrios, Izabal">
+              </div>
+              <div class="fg" style="margin-bottom:0;">
+                <label>Día</label>
+                <input type="number" id="f-dia" min="1" max="31" placeholder="DD">
+              </div>
+              <div class="fg" style="margin-bottom:0;">
+                <label>Mes</label>
+                <input type="number" id="f-mes" min="1" max="12" placeholder="MM">
+              </div>
+              <div class="fg" style="margin-bottom:0;">
+                <label>Año</label>
+                <input type="number" id="f-anio" placeholder="AAAA">
+              </div>
+            </div>
+
+            <div class="fg">
+              <label>Recibí de (Nombre del Patrocinador)</label>
+              <input type="text" id="f-patron" placeholder="Nombre exacto de la empresa o persona">
+            </div>
+
+            <div class="fg">
+              <label>Tipo de Plan</label>
+              <div class="plan-grid">
+                <label class="plan-opt sel" id="opt-basic" onclick="selectPlan('basico',this)">
+                  <input type="radio" name="plan" value="basico" checked>
+                  <div class="plan-opt-name">⬜ Plan Básico</div>
+                  <div class="plan-opt-price">Q250.00 <small>/ patrocinio</small></div>
+                </label>
+                <label class="plan-opt" id="opt-prem" onclick="selectPlan('premium',this)">
+                  <input type="radio" name="plan" value="premium">
+                  <div class="plan-opt-name">⭐ Plan Premium</div>
+                  <div class="plan-opt-price">Q500.00 <small>/ patrocinio</small></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="fg">
+                <label>Monto (Q)</label>
+                <input type="number" id="f-monto" placeholder="0.00" step="0.01" oninput="onMontoChange()">
+              </div>
+              <div class="fg">
+                <label>Monto en letras</label>
+                <input type="text" id="f-letras" readonly placeholder="Automático">
+              </div>
+            </div>
+
+            <div class="fg">
+              <label>Observaciones (opcional)</label>
+              <textarea id="f-obs" placeholder="Notas adicionales..."></textarea>
+            </div>
+
+            <div id="form-err" class="alert alert-danger" style="display:none;"></div>
+            <button class="btn btn-primary btn-block" onclick="generateReceipt()">
+              📄 Generar Recibo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recibos Emitidos</h3>
+          <span class="badge badge-navy" id="list-count-badge">0 registros</span>
+        </div>
+        <div id="receipts-list" class="receipts-list">
+          <div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SPONSOR PAGE ════════════════════ -->
+<div class="page active" id="page-sponsor">
+  <div class="sponsor-hero">
+    <span class="sponsor-hero-icon">⚙</span>
+    <h1>IV CONGRESO</h1>
+    <h2>Ingeniería Industrial</h2>
+    <p>Portal oficial de verificación y registro de material para patrocinadores</p>
+  </div>
+
+  <div class="sponsor-wrap">
+    <!-- VERIFY SECTION -->
+    <div id="sp-verify-section">
+      <div class="verify-card">
+        <div class="card-header">
+          <h3>🔍 Verificar mi Patrocinio</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">
+            Ingresa los datos <strong>exactamente</strong> como aparecen en tu recibo para verificar tu patrocinio.
+          </p>
+          <div class="fg">
+            <label>Nombre del Patrocinador (tal como aparece en el recibo)</label>
+            <input type="text" id="sp-name" placeholder="Nombre exacto de la empresa o persona">
+          </div>
+          <div class="fg">
+            <label>Número de Recibo</label>
+            <input type="text" id="sp-recibo" placeholder="Ej: 001" maxlength="10"
+                   onkeydown="if(event.key==='Enter')verifySponsor()">
+          </div>
+          <div id="sp-err" class="alert alert-danger" style="display:none;"></div>
+          <button class="btn btn-navy btn-block" onclick="verifySponsor()">Verificar mi patrocinio →</button>
+        </div>
+      </div>
+
+      <!-- PLAN INFO CARDS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
+        <div class="card" style="border-top:4px solid var(--orange);">
+          <div class="card-body" style="padding:18px;">
+            <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Básico</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--orange);font-weight:900;margin-bottom:10px;">Q250.00</div>
+            <ul style="list-style:none;font-size:12px;color:var(--text);">
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Anuncio en redes sociales</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en manta vínilica</li>
+              <li style="padding:4px 0;">✓ Publicidad en pantalla (video, durante evento)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="border-top:4px solid var(--gold);">
+          <div class="card-body" style="padding:18px;">
+            <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Premium</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--gold);font-weight:900;margin-bottom:10px;">Q500.00</div>
+            <ul style="list-style:none;font-size:12px;color:var(--text);">
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Stand publicitario (2.0×1.50m)</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Anuncio en redes sociales</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en manta vínilica</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Publicidad en pantalla (video, antes y durante)</li>
+              <li style="padding:4px 0;">✓ Acceso a conferencias</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WELCOME SECTION -->
+    <div class="welcome-section" id="sp-welcome-section">
+      <div class="welcome-banner">
+        <div class="welcome-check">✓</div>
+        <h2>¡Bienvenido!</h2>
+        <p id="sp-welcome-msg">Gracias por formar parte de nuestro Congreso</p>
+        <div class="receipt-tag" id="sp-welcome-tag"></div>
+      </div>
+
+      <div class="plan-info-box" id="sp-plan-box">
+        <h3 id="sp-plan-title"></h3>
+        <ul id="sp-plan-list"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>📤 Subir Material Publicitario</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" style="font-size:13px;margin-bottom:20px;">
+            El material que cargues será utilizado para la publicidad del evento según tu plan adquirido.
+            Asegúrate de subir archivos de buena calidad.
+          </div>
+
+          <!-- LOGO -->
+          <div class="fg">
+            <label>Logotipo de la Empresa <span style="color:var(--danger);">*</span></label>
+            <div class="upload-zone" id="logo-zone">
+              <input type="file" accept=".png,.jpg,.jpeg" id="logo-input" onchange="handleLogo(event)">
+              <div class="upload-zone-icon">🖼</div>
+              <h4>Arrastra tu logotipo aquí o haz clic</h4>
+              <p>Formato PNG o JPG · Alta resolución recomendada · Máx. 5 MB</p>
+            </div>
+            <div id="logo-preview"></div>
+          </div>
+
+          <!-- PHOTOS -->
+          <div class="fg" style="margin-top:24px;">
+            <label>Fotografías de Actividades de la Empresa <span style="color:var(--danger);">*</span> <span style="color:var(--muted);font-size:11px;">(máximo 2)</span></label>
+            <div class="upload-zone" id="photos-zone">
+              <input type="file" accept=".png,.jpg,.jpeg" multiple id="photos-input" onchange="handlePhotos(event)">
+              <div class="upload-zone-icon">📸</div>
+              <h4>Arrastra tus 2 mejores fotografías o haz clic</h4>
+              <p>Actividades de la empresa · PNG o JPG · Máx. 5 MB c/u</p>
+            </div>
+            <div class="preview-grid" id="photos-preview"></div>
+            <p id="photos-count-msg" style="font-size:12px;color:var(--muted);margin-top:8px;"></p>
+          </div>
+
+          <div id="upload-err" class="alert alert-danger" style="display:none;margin-top:16px;"></div>
+          <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;">
+            <button class="btn btn-primary" style="flex:1;" onclick="submitMaterial()">
+              ✅ Enviar material →
+            </button>
+            <button class="btn btn-outline" onclick="resetSponsor()">← Verificar otro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: RECEIPT ════ -->
+<div class="modal-overlay" id="modal-receipt">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📄 Recibo No. <span id="modal-receipt-no"></span></h3>
+      <button class="modal-close" onclick="closeModal('modal-receipt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="receipt-doc" class="rdoc"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-receipt')">Cerrar</button>
+      <button class="btn btn-primary" onclick="downloadReceipt()">⬇ Descargar / Imprimir PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: USER MANAGER ════ -->
+<div class="modal-overlay" id="modal-users">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>👥 Gestión de Usuarios</h3>
+      <button class="modal-close" onclick="closeModal('modal-users')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="font-size:13px;margin-bottom:20px;">
+        Los cambios se guardan localmente en este navegador. El usuario <strong>admin</strong> no puede eliminarse.
+      </div>
+      <div id="users-table-wrap"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
+      <h4 style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px;">Agregar Nuevo Usuario</h4>
+      <div class="row2">
+        <div class="fg"><label>Usuario</label><input type="text" id="nu-user" placeholder="nombre_usuario"></div>
+        <div class="fg"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="contraseña segura"></div>
+      </div>
+      <div class="fg">
+        <label>Rol</label>
+        <select id="nu-role">
+          <option value="tesorero">Tesorero</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div id="user-err" class="alert alert-danger" style="display:none;"></div>
+      <button class="btn btn-primary" onclick="addUser()">Agregar usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: GOOGLE GUIDE ════ -->
+<div class="modal-overlay" id="modal-guide">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📖 Guía de Configuración — Google Sheets + Drive</h3>
+      <button class="modal-close" onclick="closeModal('modal-guide')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="alert alert-info" style="font-size:13px;margin-bottom:22px;">
+        Sigue estos pasos <strong>una sola vez</strong>. Después, todos los recibos y archivos de patrocinadores se guardarán automáticamente en tu Google.
+      </div>
+
+      <div class="guide-step">
+        <h4>1️⃣ Crear la hoja de cálculo en Google Sheets</h4>
+        <ul>
+          <li>Ve a <strong>sheets.google.com</strong> y crea una hoja nueva.</li>
+          <li>En la fila 1 agrega estos encabezados (una columna por celda):<br>
+            <code style="font-size:12px;">No. Recibo | Fecha | Lugar | Patrocinador | Monto Q | En letras | Plan | Observaciones | Timestamp</code>
+          </li>
+          <li>Guarda el ID de la hoja (parte de la URL entre <code>/d/</code> y <code>/edit</code>).</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>2️⃣ Crear la carpeta en Google Drive</h4>
+        <ul>
+          <li>Ve a <strong>drive.google.com</strong> y crea una carpeta llamada <em>"IV Congreso — Patrocinadores"</em>.</li>
+          <li>Copia el ID de la carpeta (parte final de la URL al abrirla).</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>3️⃣ Crear el Google Apps Script</h4>
+        <ul>
+          <li>En tu hoja de Sheets, ve a <strong>Extensiones → Apps Script</strong>.</li>
+          <li>Borra todo el código existente y pega el siguiente:</li>
+        </ul>
+        <div class="code-block">const SHEET_ID = 'TU_SHEET_ID_AQUI';
+const FOLDER_ID = 'TU_FOLDER_ID_AQUI';
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    
+    if (data.type === 'receipt') {
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getActiveSheet();
+      sheet.appendRow([
+        data.no, data.fecha, data.lugar,
+        data.patrocinador, data.monto,
+        data.letras, data.plan,
+        data.obs, new Date()
+      ]);
+    }
+    
+    if (data.type === 'file') {
+      var folder = DriveApp.getFolderById(FOLDER_ID);
+      var sub = null;
+      var folders = folder.getFoldersByName(data.sponsor);
+      if (folders.hasNext()) { sub = folders.next(); }
+      else { sub = folder.createFolder(data.sponsor); }
+      var blob = Utilities.newBlob(
+        Utilities.base64Decode(data.content),
+        data.mimeType, data.filename
+      );
+      sub.createFile(blob);
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ok:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ok:false,error:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput('OK');
+}</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;">⚠ Reemplaza <code>TU_SHEET_ID_AQUI</code> y <code>TU_FOLDER_ID_AQUI</code> con tus IDs reales.</p>
+      </div>
+
+      <div class="guide-step">
+        <h4>4️⃣ Publicar como Web App</h4>
+        <ul>
+          <li>Haz clic en <strong>Implementar → Nueva implementación</strong>.</li>
+          <li>Tipo: <strong>Aplicación web</strong>.</li>
+          <li>Ejecutar como: <strong>Yo (tu cuenta)</strong>.</li>
+          <li>Quién tiene acceso: <strong>Cualquier persona</strong>.</li>
+          <li>Haz clic en <strong>Implementar</strong> y autoriza los permisos.</li>
+          <li>Copia la URL que termina en <code>/exec</code>.</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>5️⃣ Pegar la URL aquí</h4>
+        <div class="fg" style="margin-top:12px;">
+          <label>URL del Web App (termina en /exec)</label>
+          <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <button class="btn btn-primary" onclick="saveGoogleUrl()">💾 Guardar URL</button>
+        <div id="guide-save-msg" style="display:none;margin-top:10px;" class="alert alert-success">✓ URL guardada correctamente. El sistema ya está conectado a Google.</div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-guide')">Cerrar guía</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA STORE (localStorage)
+// ══════════════════════════════════════════
+var DB = {
+  get: function(k,def){ try{ var v=localStorage.getItem('iv4_'+k); return v!==null?JSON.parse(v):def; }catch(e){return def;} },
+  set: function(k,v){ try{ localStorage.setItem('iv4_'+k,JSON.stringify(v)); }catch(e){} }
+};
+
+// Init default users if not set
+(function(){
+  if(!DB.get('users',null)){
+    DB.set('users',[
+      {user:'admin',pass:'Congreso2025!',role:'admin'},
+      {user:'tesorero1',pass:'Tesoreria2025',role:'tesorero'},
+      {user:'tesorero2',pass:'Tesoreria2025',role:'tesorero'}
+    ]);
+  }
+})();
+
+var receipts = DB.get('receipts',[]);
+var currentUser = null;
+var currentReceipt = null;
+var selectedPlan = 'basico';
+var logoFile = null;
+var photoFiles = [];
+var sheetsUrl = DB.get('sheets_url','');
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function showTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function doLogin(){
+  var u=document.getElementById('lu').value.trim();
+  var p=document.getElementById('lp').value;
+  var err=document.getElementById('login-err');
+  var users=DB.get('users',[]);
+  var found=users.find(x=>x.user===u&&x.pass===p);
+  if(found){
+    currentUser=found;
+    err.style.display='none';
+    document.getElementById('treasury-login').style.display='none';
+    document.getElementById('treasury-dash').style.display='block';
+    document.getElementById('dash-user-label').textContent='Sesión iniciada como: '+found.user+' ('+found.role+')';
+    var adminBtns=document.getElementById('admin-btns');
+    var adminSheetsBtn=document.getElementById('admin-sheets-btn');
+    if(found.role==='admin'){
+      adminBtns.style.display='flex';
+      if(adminSheetsBtn) adminSheetsBtn.style.display='inline';
+    } else {
+      adminBtns.style.display='none';
+      if(adminSheetsBtn) adminSheetsBtn.style.display='none';
+    }
+    updateSheetsStatus();
+    renderReceiptsList();
+    updateStats();
+    updateNextBadge();
+    prefillDate();
+  } else {
+    err.style.display='block';
+    err.textContent='Usuario o contraseña incorrectos. Inténtalo de nuevo.';
+  }
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('treasury-login').style.display='flex';
+  document.getElementById('treasury-dash').style.display='none';
+  document.getElementById('lu').value='';
+  document.getElementById('lp').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+function prefillDate(){
+  var d=new Date();
+  document.getElementById('f-dia').value=d.getDate();
+  document.getElementById('f-mes').value=d.getMonth()+1;
+  document.getElementById('f-anio').value=d.getFullYear();
+}
+
+// ══════════════════════════════════════════
+// USER MANAGER
+// ══════════════════════════════════════════
+function openUserMgr(){
+  renderUsersTable();
+  openModal('modal-users');
+}
+
+function renderUsersTable(){
+  var users=DB.get('users',[]);
+  var html='<table class="user-table"><thead><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>';
+  users.forEach(function(u,i){
+    html+='<tr>';
+    html+='<td><strong>'+u.user+'</strong></td>';
+    html+='<td><span class="badge '+(u.role==='admin'?'badge-admin':'badge-basic')+'">'+u.role+'</span></td>';
+    html+='<td><div class="user-actions">';
+    if(u.user!=='admin'){
+      html+='<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')">Eliminar</button>';
+    } else {
+      html+='<span style="font-size:12px;color:var(--muted);">No eliminable</span>';
+    }
+    html+='</div></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('users-table-wrap').innerHTML=html;
+}
+
+function addUser(){
+  var u=document.getElementById('nu-user').value.trim();
+  var p=document.getElementById('nu-pass').value;
+  var r=document.getElementById('nu-role').value;
+  var err=document.getElementById('user-err');
+  if(!u||!p){ err.style.display='block';err.textContent='Completa usuario y contraseña.';return; }
+  var users=DB.get('users',[]);
+  if(users.find(x=>x.user===u)){ err.style.display='block';err.textContent='Ese nombre de usuario ya existe.';return; }
+  users.push({user:u,pass:p,role:r});
+  DB.set('users',users);
+  err.style.display='none';
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-pass').value='';
+  renderUsersTable();
+  showToast('✓ Usuario "'+u+'" agregado correctamente.');
+}
+
+function deleteUser(i){
+  if(!confirm('¿Eliminar este usuario?')) return;
+  var users=DB.get('users',[]);
+  users.splice(i,1);
+  DB.set('users',users);
+  renderUsersTable();
+  showToast('Usuario eliminado.');
+}
+
+// ══════════════════════════════════════════
+// GOOGLE GUIDE
+// ══════════════════════════════════════════
+function openGuide(){
+  if(sheetsUrl) document.getElementById('sheets-url-input').value=sheetsUrl;
+  openModal('modal-guide');
+}
+
+function saveGoogleUrl(){
+  var url=document.getElementById('sheets-url-input').value.trim();
+  if(!url){ showToast('⚠ Ingresa una URL válida.'); return; }
+  sheetsUrl=url;
+  DB.set('sheets_url',url);
+  document.getElementById('guide-save-msg').style.display='block';
+  updateSheetsStatus();
+  showToast('✓ URL de Google guardada correctamente.');
+}
+
+function updateSheetsStatus(){
+  var st=document.getElementById('sheets-state-txt');
+  var isAdmin=currentUser&&currentUser.role==='admin';
+  var adminBtn=document.getElementById('admin-sheets-btn');
+  if(sheetsUrl){
+    st.textContent='Conectado ✓';
+    st.style.color='var(--success)';
+  } else {
+    st.textContent='No configurado';
+    st.style.color='var(--danger)';
+  }
+  if(adminBtn) adminBtn.style.display=isAdmin?'inline':'none';
+}
+
+// ══════════════════════════════════════════
+// NUMBER → LETTERS (Spanish / Quetzales)
+// ══════════════════════════════════════════
+var _ones=['','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve',
+  'diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve'];
+var _tens=['','','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+var _hunds=['','cien','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+
+function _conv(n){
+  if(n===0) return '';
+  if(n<20) return _ones[n];
+  if(n<100){
+    var t=Math.floor(n/10),r=n%10;
+    return r===0?_tens[t]:_tens[t]+' y '+_ones[r];
+  }
+  if(n<1000){
+    var h=Math.floor(n/100),r2=n%100;
+    var base=h===1&&r2===0?'cien':_hunds[h];
+    return r2===0?base:base+' '+_conv(r2);
+  }
+  if(n<1000000){
+    var th=Math.floor(n/1000),r3=n%1000;
+    var prefix=th===1?'mil':_conv(th)+' mil';
+    return r3===0?prefix:prefix+' '+_conv(r3);
+  }
+  return n.toString();
+}
+
+function numToLetras(amount){
+  if(!amount||isNaN(amount)) return '';
+  var n=Math.round(parseFloat(amount)*100)/100;
+  var int=Math.floor(n);
+  var cents=Math.round((n-int)*100);
+  var base=int===0?'cero':_conv(int);
+  var result=base.charAt(0).toUpperCase()+base.slice(1)+' quetzales';
+  if(cents>0) result+=' con '+cents.toString().padStart(2,'0')+'/100';
+  else result+=' exactos';
+  return result;
+}
+
+function onMontoChange(){
+  var v=document.getElementById('f-monto').value;
+  document.getElementById('f-letras').value=numToLetras(v);
+}
+
+// ══════════════════════════════════════════
+// PLAN SELECT
+// ══════════════════════════════════════════
+function selectPlan(plan,el){
+  selectedPlan=plan;
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  var monto=plan==='basico'?250:500;
+  document.getElementById('f-monto').value=monto.toFixed(2);
+  document.getElementById('f-letras').value=numToLetras(monto);
+}
+
+// ══════════════════════════════════════════
+// RECEIPT NUMBER
+// ══════════════════════════════════════════
+function nextReceiptNo(){
+  var last=receipts.length>0?parseInt(receipts[receipts.length-1].no):0;
+  return String(last+1).padStart(3,'0');
+}
+function updateNextBadge(){
+  document.getElementById('next-no-badge').textContent='No. '+nextReceiptNo();
+}
+
+// ══════════════════════════════════════════
+// GENERATE RECEIPT
+// ══════════════════════════════════════════
+function generateReceipt(){
+  var lugar=document.getElementById('f-lugar').value.trim();
+  var dia=document.getElementById('f-dia').value.trim();
+  var mes=document.getElementById('f-mes').value.trim();
+  var anio=document.getElementById('f-anio').value.trim();
+  var patron=document.getElementById('f-patron').value.trim();
+  var monto=parseFloat(document.getElementById('f-monto').value)||0;
+  var letras=document.getElementById('f-letras').value.trim();
+  var obs=document.getElementById('f-obs').value.trim();
+  var err=document.getElementById('form-err');
+
+  if(!lugar||!dia||!mes||!anio||!patron||!monto){
+    err.style.display='block';
+    err.textContent='Por favor completa todos los campos obligatorios.';
+    return;
+  }
+  err.style.display='none';
+
+  var no=nextReceiptNo();
+  var r={no,lugar,dia,mes,anio,patron,monto:monto.toFixed(2),letras,plan:selectedPlan,obs,ts:Date.now()};
+  receipts.push(r);
+  DB.set('receipts',receipts);
+  currentReceipt=r;
+  sendToSheets(r);
+  renderReceiptDoc(r);
+  document.getElementById('modal-receipt-no').textContent=r.no;
+  openModal('modal-receipt');
+  renderReceiptsList();
+  updateStats();
+  updateNextBadge();
+  showToast('✓ Recibo No. '+r.no+' generado correctamente.');
+  // Reset form
+  document.getElementById('f-patron').value='';
+  document.getElementById('f-obs').value='';
+}
+
+// ══════════════════════════════════════════
+// PLAN DATA
+// ══════════════════════════════════════════
+var PLANS={
+  basico:{
+    label:'Plan Básico',price:'Q250.00',
+    items:['Espacio en afiche','Anuncio en redes sociales (en toda la publicidad hasta el día del evento)','Espacio en manta vínilica','Publicidad en pantalla (en video, durante el evento)']
+  },
+  premium:{
+    label:'Plan Premium',price:'Q500.00',
+    items:['Stand publicitario (2.0×1.50m)','Espacio en afiche','Anuncio en redes sociales (en toda la publicidad hasta el día del evento)','Espacio en manta vínilica','Publicidad en pantalla (en video, antes y durante el evento)','Acceso a las conferencias (no incluye alimentación)']
+  }
+};
+
+var MESES=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ══════════════════════════════════════════
+// RENDER RECEIPT DOC (fiel al modelo)
+// ══════════════════════════════════════════
+function renderReceiptDoc(r){
+  var isBasic=r.plan==='basico';
+  var basicItems=PLANS.basico.items.map(i=>'<li>'+i+'</li>').join('');
+  var premItems=PLANS.premium.items.map(i=>'<li>'+i+'</li>').join('');
+  var mesNom=MESES[parseInt(r.mes)]||r.mes;
+  var montoFmt='Q '+parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  document.getElementById('receipt-doc').innerHTML=`
+  <div class="rdoc-top">
+    <div class="rdoc-brand">
+      <div class="rdoc-gear">⚙</div>
+      <div class="rdoc-brand-text">
+        <h2>IV Congreso<br>Ingeniería Industrial</h2>
+        <p>Puerto Barrios</p>
+      </div>
+    </div>
+    <div class="rdoc-no-box">
+      <div class="rdoc-no-label">Recibo No.</div>
+      <span class="rdoc-no-val">${r.no}</span>
+    </div>
+  </div>
+
+  <table class="rdoc-table">
+    <tr>
+      <td class="rdoc-th" style="width:90px;">Lugar</td>
+      <td>${r.lugar}</td>
+      <td class="rdoc-th" style="width:40px;">Día</td>
+      <td style="width:50px;text-align:center;">${r.dia}</td>
+      <td class="rdoc-th" style="width:50px;">Mes</td>
+      <td style="width:100px;">${mesNom}</td>
+      <td class="rdoc-th" style="width:45px;">Año</td>
+      <td style="width:60px;">${r.anio}</td>
+    </tr>
+    <tr>
+      <td class="rdoc-th">Recibí de:</td>
+      <td colspan="4">${r.patron}</td>
+      <td class="rdoc-th">La cantidad de Q</td>
+      <td colspan="2" style="font-weight:700;font-size:14px;">${montoFmt}</td>
+    </tr>
+  </table>
+
+  <div class="rdoc-amount-row">
+    <div class="rdoc-amount-label">Cantidad (en letras):</div>
+    <div class="rdoc-amount-val">${r.letras}</div>
+  </div>
+
+  <div class="rdoc-concept">
+    <div class="rdoc-concept-label">Por concepto de:</div>
+    <div class="rdoc-plans">
+      <div class="rdoc-plan ${isBasic?'active':''}">
+        <div class="rdoc-plan-title">
+          <span class="rdoc-plan-circle ${isBasic?'filled':'empty'}"></span>
+          PLAN BÁSICO
+        </div>
+        <ul>${basicItems}</ul>
+      </div>
+      <div class="rdoc-plan ${!isBasic?'active':''}">
+        <div class="rdoc-plan-title">
+          <span class="rdoc-plan-circle ${!isBasic?'filled':'empty'}"></span>
+          PLAN PREMIUM
+        </div>
+        <ul>${premItems}</ul>
+      </div>
+    </div>
+    ${r.obs?'<p style="font-size:11px;color:#666;margin-top:10px;"><strong>Obs.:</strong> '+r.obs+'</p>':''}
+  </div>
+
+  <div class="rdoc-footer">
+    <div class="rdoc-footer-note">Su aporte como patrocinador sirve para contribuir los gastos inherentes del congreso.</div>
+    <div class="rdoc-footer-copies">
+      <span class="orig">Original: Patrocinador</span>
+      <span class="dupl">Duplicado: Organizadores</span>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// DOWNLOAD RECEIPT
+// ══════════════════════════════════════════
+function downloadReceipt(){
+  var r=currentReceipt; if(!r) return;
+  var content=document.getElementById('receipt-doc').innerHTML;
+  var w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<title>Recibo No. ${r.no} — IV Congreso Ingeniería Industrial</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Barlow,Arial,sans-serif;padding:30px;color:#111;font-size:12px;background:#fff;}
+.rdoc{border:1px solid #bbb;border-radius:6px;overflow:hidden;max-width:780px;margin:0 auto;}
+.rdoc-top{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:2px solid #111;gap:20px;}
+.rdoc-brand{display:flex;align-items:center;gap:12px;}
+.rdoc-gear{font-size:52px;line-height:1;color:#E8580A;}
+.rdoc-brand-text h2{font-family:'Barlow Condensed',Arial,sans-serif;font-size:24px;font-weight:900;color:#E8580A;letter-spacing:.5px;line-height:1.1;text-transform:uppercase;}
+.rdoc-brand-text p{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:2px;}
+.rdoc-no-box{text-align:right;}
+.rdoc-no-label{background:#888;color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 18px;border-radius:4px;display:inline-block;margin-bottom:6px;}
+.rdoc-no-val{font-family:'Barlow Condensed',Arial,sans-serif;font-size:36px;font-weight:900;color:#0D1F3C;letter-spacing:2px;line-height:1;display:block;}
+.rdoc-table{width:100%;border-collapse:collapse;}
+.rdoc-table td{border:1px solid #bbb;padding:8px 12px;font-size:12px;vertical-align:middle;}
+.rdoc-th{background:#E8E8E8;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;color:#444;}
+.rdoc-amount-row{padding:12px 20px;border-bottom:1px solid #ccc;}
+.rdoc-amount-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:4px;}
+.rdoc-amount-val{font-size:15px;font-weight:700;color:#0D1F3C;border:1.5px solid #0D1F3C;border-radius:4px;padding:8px 14px;min-height:56px;}
+.rdoc-concept{padding:14px 20px;border-bottom:1px solid #ccc;}
+.rdoc-concept-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:10px;}
+.rdoc-plans{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.rdoc-plan{border:1.5px solid #bbb;border-radius:6px;padding:12px 14px;}
+.rdoc-plan.active{border-color:#E8580A;background:#FFF5EF;}
+.rdoc-plan-title{font-family:'Barlow Condensed',Arial,sans-serif;font-size:16px;font-weight:900;color:#0D1F3C;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.rdoc-plan-circle{width:18px;height:18px;border-radius:50%;border:2px solid;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rdoc-plan-circle.filled{background:#E8580A;border-color:#E8580A;}
+.rdoc-plan-circle.empty{border-color:#bbb;}
+.rdoc-plan ul{font-size:10.5px;padding-left:16px;line-height:1.75;color:#333;}
+.rdoc-footer{display:flex;align-items:flex-end;justify-content:space-between;padding:12px 20px;border-top:1px solid #ccc;}
+.rdoc-footer-note{font-size:10px;color:#666;max-width:320px;line-height:1.5;}
+.rdoc-footer-copies{text-align:right;font-size:10px;font-weight:700;line-height:1.8;}
+.orig{color:#E8580A;display:block;} .dupl{color:#0D1F3C;display:block;}
+@media print{@page{size:A4 landscape;margin:12mm;}body{padding:0;}}
+</style></head><body>
+<div class="rdoc">${content}</div>
+<script>window.onload=function(){window.print();};<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════
+// RECEIPTS LIST
+// ══════════════════════════════════════════
+function renderReceiptsList(){
+  var el=document.getElementById('receipts-list');
+  document.getElementById('list-count-badge').textContent=receipts.length+' registro'+(receipts.length!==1?'s':'');
+  if(!receipts.length){ el.innerHTML='<div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>'; return; }
+  el.innerHTML=[...receipts].reverse().map(r=>`
+    <div class="ri" onclick="viewReceipt('${r.no}')">
+      <div class="ri-no">No.${r.no}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="ri-name">${r.patron}</div>
+        <div class="ri-meta">${r.dia}/${r.mes}/${r.anio} &nbsp;·&nbsp;
+          <span class="badge ${r.plan==='basico'?'badge-basic':'badge-premium'}">${r.plan.toUpperCase()}</span>
+        </div>
+      </div>
+      <div class="ri-amount">Q ${parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
+    </div>
+  `).join('');
+}
+
+function viewReceipt(no){
+  var r=receipts.find(x=>x.no===no); if(!r) return;
+  currentReceipt=r;
+  renderReceiptDoc(r);
+  document.getElementById('modal-receipt-no').textContent=r.no;
+  openModal('modal-receipt');
+}
+
+function updateStats(){
+  var basic=receipts.filter(r=>r.plan==='basico');
+  var prem=receipts.filter(r=>r.plan==='premium');
+  var total=receipts.reduce(function(s,r){return s+parseFloat(r.monto);},0);
+  document.getElementById('st-total').textContent=receipts.length;
+  document.getElementById('st-basic').textContent=basic.length;
+  document.getElementById('st-prem').textContent=prem.length;
+  document.getElementById('st-total-q').textContent='Q '+total.toLocaleString('es-GT',{minimumFractionDigits:2});
+  document.getElementById('st-last').textContent=receipts.length?'No.'+receipts[receipts.length-1].no:'—';
+}
+
+// ══════════════════════════════════════════
+// GOOGLE SHEETS INTEGRATION
+// ══════════════════════════════════════════
+function sendToSheets(r){
+  if(!sheetsUrl) return;
+  var payload=Object.assign({type:'receipt',fecha:r.dia+'/'+r.mes+'/'+r.anio},r);
+  fetch(sheetsUrl,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).catch(function(){});
+}
+
+function sendFileToDrive(sponsor,filename,base64content,mimeType){
+  if(!sheetsUrl) return Promise.resolve();
+  return fetch(sheetsUrl,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:'file',sponsor,filename,content:base64content,mimeType})
+  }).catch(function(){});
+}
+
+// ══════════════════════════════════════════
+// SPONSOR VERIFICATION
+// ══════════════════════════════════════════
+function verifySponsor(){
+  var name=document.getElementById('sp-name').value.trim();
+  var no=document.getElementById('sp-recibo').value.trim().padStart(3,'0');
+  var err=document.getElementById('sp-err');
+  if(!name||!no){ err.style.display='block'; err.textContent='Por favor ingresa tu nombre y número de recibo.'; return; }
+  var found=receipts.find(function(r){ return r.no===no && r.patron.trim()===name; });
+  if(!found){
+    err.style.display='block';
+    err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+    return;
+  }
+  err.style.display='none';
+  showWelcome(found);
+}
+
+function showWelcome(r){
+  document.getElementById('sp-verify-section').style.display='none';
+  var ws=document.getElementById('sp-welcome-section');
+  ws.classList.add('show');
+  document.getElementById('sp-welcome-msg').textContent='¡Bienvenido/a, '+r.patron+'! Gracias por formar parte de nuestro Congreso.';
+  document.getElementById('sp-welcome-tag').textContent='Recibo No. '+r.no+' · Plan '+PLANS[r.plan].label;
+  var plan=PLANS[r.plan];
+  document.getElementById('sp-plan-title').innerHTML=(r.plan==='basico'?'⬜':'⭐')+' '+plan.label+' — '+plan.price;
+  document.getElementById('sp-plan-list').innerHTML=plan.items.map(i=>'<li><span class="plan-check">✓</span>'+i+'</li>').join('');
+  window._currentSponsorReceipt=r;
+}
+
+function resetSponsor(){
+  document.getElementById('sp-verify-section').style.display='block';
+  document.getElementById('sp-welcome-section').classList.remove('show');
+  document.getElementById('sp-name').value='';
+  document.getElementById('sp-recibo').value='';
+  document.getElementById('sp-err').style.display='none';
+  document.getElementById('logo-preview').innerHTML='';
+  document.getElementById('photos-preview').innerHTML='';
+  document.getElementById('logo-input').value='';
+  document.getElementById('photos-input').value='';
+  document.getElementById('photos-count-msg').textContent='';
+  document.getElementById('upload-err').style.display='none';
+  logoFile=null; photoFiles=[];
+  window._currentSponsorReceipt=null;
+}
+
+// ══════════════════════════════════════════
+// UPLOADS
+// ══════════════════════════════════════════
+function handleLogo(e){
+  var file=e.target.files[0]; if(!file) return;
+  if(file.size>5*1024*1024){ showToast('⚠ El logotipo excede 5 MB.'); return; }
+  logoFile=file;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('logo-preview').innerHTML=`
+      <div style="margin-top:12px;display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:var(--radius);padding:10px 14px;border:1px solid var(--border);">
+        <img src="${ev.target.result}" style="height:60px;max-width:120px;object-fit:contain;border-radius:4px;border:1px solid var(--border);">
+        <div><div style="font-size:13px;font-weight:700;color:var(--navy);">${file.name}</div>
+        <div style="font-size:12px;color:var(--muted);">${(file.size/1024).toFixed(0)} KB</div></div>
+      </div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handlePhotos(e){
+  var files=Array.from(e.target.files).slice(0,2);
+  photoFiles=files;
+  var grid=document.getElementById('photos-preview');
+  grid.innerHTML='';
+  var count=0;
+  files.forEach(function(file){
+    if(file.size>5*1024*1024){ showToast('⚠ '+file.name+' excede 5 MB.'); return; }
+    count++;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var d=document.createElement('div');
+      d.className='preview-thumb';
+      d.innerHTML='<img src="'+ev.target.result+'" alt="'+file.name+'">';
+      grid.appendChild(d);
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('photos-count-msg').textContent=count+' fotografía'+(count!==1?'s':'')+' seleccionada'+(count!==1?'s':'')+(count<2?' (se recomienda subir 2)':'');
+}
+
+function fileToBase64(file){
+  return new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(e){ res(e.target.result.split(',')[1]); };
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function submitMaterial(){
+  var err=document.getElementById('upload-err');
+  if(!logoFile){ err.style.display='block'; err.textContent='Por favor sube el logotipo de tu empresa.'; return; }
+  if(!photoFiles||photoFiles.length<1){ err.style.display='block'; err.textContent='Por favor sube al menos una fotografía de actividades.'; return; }
+  err.style.display='none';
+  var r=window._currentSponsorReceipt;
+  var sponsorName=r?r.patron:'Patrocinador';
+
+  var promises=[];
+  promises.push(fileToBase64(logoFile).then(function(b64){
+    return sendFileToDrive(sponsorName,'logo_'+logoFile.name,b64,logoFile.type);
+  }));
+  photoFiles.forEach(function(f,i){
+    promises.push(fileToBase64(f).then(function(b64){
+      return sendFileToDrive(sponsorName,'foto'+(i+1)+'_'+f.name,b64,f.type);
+    }));
+  });
+  Promise.all(promises).then(function(){
+    showToast('✓ Material enviado exitosamente. ¡Gracias!');
+    document.getElementById('upload-err').style.display='none';
+    document.querySelector('#sp-welcome-section .card .card-body').innerHTML=`
+      <div class="alert alert-success" style="text-align:center;padding:32px;font-size:16px;">
+        <div style="font-size:40px;margin-bottom:12px;">✅</div>
+        <strong>¡Material enviado exitosamente!</strong><br>
+        <span style="font-size:14px;color:var(--success);">Tu logotipo y fotografías han sido recibidos.<br>Serán utilizados en la publicidad del IV Congreso.</span>
+        <div style="margin-top:20px;">
+          <button class="btn btn-outline" onclick="resetSponsor()">← Verificar otro patrocinador</button>
+        </div>
+      </div>`;
+  }).catch(function(){
+    showToast('✓ Material recibido localmente. Configura Google Drive para envío automático.');
+  });
+}
+
+// ══════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+var _toastTimer=null;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){ t.classList.remove('show'); },3800);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){
+  showTab('sponsor');
+});
+</script>
+</body>
+</html>
