@@ -456,6 +456,1762 @@ nav{
 <!-- ════════════════════ NAV ════════════════════ -->
 <nav>
   <div class="nav-brand">
+    <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:46px;width:auto;object-fit:contain;border-radius:6px;flex-shrink:0;background:transparent;" alt="Logo">
+    <div class="nav-brand-text">
+      <b>IV Congreso</b>
+      <small>Ingeniería Industrial · Puerto Barrios</small>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab" id="tab-treasury" onclick="showTab('treasury')">
+      <span class="ti">🏦</span> Tesorería
+    </div>
+    <div class="nav-tab active" id="tab-sponsor" onclick="showTab('sponsor')">
+      <span class="ti">🤝</span> Portal del Patrocinador
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════ TREASURY PAGE ════════════════════ -->
+<div class="page" id="page-treasury">
+
+  <!-- LOGIN -->
+  <div class="login-page" id="treasury-login">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">🏦</div>
+        <h2>Tesorería</h2>
+        <p>IV Congreso · Puerto Barrios</p>
+      </div>
+      <div id="login-err" class="alert alert-danger" style="display:none;"></div>
+      <div class="fg">
+        <label>Usuario</label>
+        <input type="text" id="lu" placeholder="tu usuario" autocomplete="username">
+      </div>
+      <div class="fg">
+        <label>Contraseña</label>
+        <input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Ingresar al sistema →</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="treasury-dash" style="display:none;">
+
+    <div class="pg-header">
+      <div class="pg-header-left">
+        <h1>📋 Módulo de Tesorería</h1>
+        <p id="dash-user-label">IV Congreso de Ingeniería Industrial · Puerto Barrios</p>
+      </div>
+      <div class="pg-header-actions">
+        <span id="admin-btns" style="display:none;gap:10px;display:none;">
+          <button class="btn btn-ghost btn-sm" onclick="openUserMgr()">👥 Gestionar usuarios</button>
+          <button class="btn btn-ghost btn-sm" onclick="openGuide()">📖 Guía Google</button>
+        </span>
+        <button class="btn btn-ghost btn-sm" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">Total patrocinadores</div>
+        <div class="stat-val" id="st-total">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Plan Básico</div>
+        <div class="stat-val c-orange" id="st-basic">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Plan Premium</div>
+        <div class="stat-val c-gold" id="st-prem">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Ingresos totales</div>
+        <div class="stat-val c-success" id="st-total-q">Q0.00</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Último recibo</div>
+        <div class="stat-val" id="st-last">—</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- FORM -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Nuevo Recibo</h3>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="badge badge-orange" id="next-no-badge">No. 001</span>
+              <button class="btn btn-sm" id="btn-manual-no" onclick="toggleManualNo()"
+                style="background:var(--bg);border:1px solid var(--border);color:var(--navy);font-size:11px;padding:4px 10px;">
+                ✏ No. manual
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <!-- Campo número manual (oculto por defecto) -->
+            <div id="manual-no-wrap" style="display:none;margin-bottom:16px;">
+              <div class="alert alert-warning" style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:10px;">
+                ⚠ <strong>Modo número manual:</strong> Ingresa el número de recibo que deseas reutilizar (ej: 003).
+                Asegúrate de que ese número ya fue eliminado para evitar duplicados.
+              </div>
+              <div class="fg" style="margin-bottom:0;">
+                <label>Número de Recibo Manual</label>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <input type="number" id="f-no-manual" min="1" placeholder="Ej: 3"
+                    style="max-width:140px;"
+                    oninput="previewManualNo(this.value)">
+                  <span id="manual-no-preview" style="font-family:var(--display);font-size:20px;font-weight:900;color:var(--orange);"></span>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info" id="sheets-status-msg" style="font-size:13px;">
+              📊 Google Sheets: <strong id="sheets-state-txt">No configurado</strong>
+              <span id="admin-sheets-btn" style="display:none;">
+                — <a href="#" onclick="openGuide()" style="color:inherit;font-weight:700;text-decoration:underline;">Configurar →</a>
+              </span>
+            </div>
+
+            <div class="row2" style="margin-bottom:16px;">
+              <div class="fg" style="margin-bottom:0;">
+                <label>Lugar</label>
+                <input type="text" id="f-lugar" value="Puerto Barrios, Izabal">
+              </div>
+              <div class="fg" style="margin-bottom:0;">
+                <label>Fecha</label>
+                <input type="date" id="f-fecha" onchange="parseFecha(this.value)">
+                <input type="hidden" id="f-dia"><input type="hidden" id="f-mes"><input type="hidden" id="f-anio">
+              </div>
+            </div>
+
+            <div class="fg">
+              <label>Recibí de (Nombre del Patrocinador)</label>
+              <input type="text" id="f-patron" placeholder="Nombre exacto de la empresa o persona">
+            </div>
+
+            <div class="fg">
+              <label>Tipo de Plan</label>
+              <div class="plan-grid">
+                <label class="plan-opt sel" id="opt-basic" onclick="selectPlan('basico',this)">
+                  <input type="radio" name="plan" value="basico" checked>
+                  <div class="plan-opt-name">⬜ Plan Básico</div>
+                  <div class="plan-opt-price">Q250.00 <small>/ patrocinio</small></div>
+                </label>
+                <label class="plan-opt" id="opt-prem" onclick="selectPlan('premium',this)">
+                  <input type="radio" name="plan" value="premium">
+                  <div class="plan-opt-name">⭐ Plan Premium</div>
+                  <div class="plan-opt-price">Q500.00 <small>/ patrocinio</small></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="fg">
+                <label>Monto (Q)</label>
+                <input type="number" id="f-monto" placeholder="0.00" step="0.01" oninput="onMontoChange()">
+              </div>
+              <div class="fg">
+                <label>Monto en letras</label>
+                <input type="text" id="f-letras" readonly placeholder="Automático">
+              </div>
+            </div>
+
+            <div class="fg">
+              <label>Observaciones (opcional)</label>
+              <textarea id="f-obs" placeholder="Notas adicionales..."></textarea>
+            </div>
+
+            <div id="form-err" class="alert alert-danger" style="display:none;"></div>
+            <button class="btn btn-primary btn-block" onclick="generateReceipt()">
+              📄 Generar Recibo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recibos Emitidos</h3>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="badge badge-navy" id="list-count-badge">0 registros</span>
+            <button class="btn btn-ghost btn-sm" onclick="loadReceiptsFromSheets()" title="Sincronizar con Google Sheets" style="background:var(--navy);color:white;padding:5px 12px;font-size:12px;">🔄 Sincronizar</button>
+          </div>
+        </div>
+        <div id="receipts-list" class="receipts-list">
+          <div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SPONSOR PAGE ════════════════════ -->
+<div class="page active" id="page-sponsor">
+  <div class="sponsor-hero">
+    <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:90px;width:auto;display:block;margin:0 auto 16px;object-fit:contain;background:transparent;" alt="Logo">
+    <h1>IV CONGRESO</h1>
+    <h2>con enfásis en logística</h2>
+    <h2>Ingeniería Industrial</h2>
+    <p>Portal oficial de verificación y registro de material para patrocinadores</p>
+  </div>
+
+  <div class="sponsor-wrap">
+    <!-- VERIFY SECTION -->
+    <div id="sp-verify-section">
+      <div class="verify-card">
+        <div class="card-header">
+          <h3>🔍 Verificar mi Patrocinio</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">
+            Ingresa los datos <strong>exactamente</strong> como aparecen en tu recibo para verificar tu patrocinio.
+          </p>
+          <div class="fg">
+            <label>Nombre del Patrocinador (tal como aparece en el recibo)</label>
+            <input type="text" id="sp-name" placeholder="Nombre exacto de la empresa o persona">
+          </div>
+          <div class="fg">
+            <label>Número de Recibo</label>
+            <input type="text" id="sp-recibo" placeholder="Ej: 001" maxlength="10"
+                   onkeydown="if(event.key==='Enter')verifySponsor()">
+          </div>
+          <div id="sp-err" class="alert alert-danger" style="display:none;"></div>
+          <button class="btn btn-navy btn-block" onclick="verifySponsor()">Verificar mi patrocinio →</button>
+        </div>
+      </div>
+
+      <!-- PLAN INFO CARDS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
+        <div class="card" style="border-top:4px solid var(--orange);">
+          <div class="card-body" style="padding:18px;">
+            <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Básico</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--orange);font-weight:900;margin-bottom:10px;">Q250.00</div>
+            <ul style="list-style:none;font-size:12px;color:var(--text);">
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Anuncio en redes sociales</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en manta vínilica</li>
+              <li style="padding:4px 0;">✓ Publicidad en pantalla (video, durante evento)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card" style="border-top:4px solid var(--gold);">
+          <div class="card-body" style="padding:18px;">
+            <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Premium</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--gold);font-weight:900;margin-bottom:10px;">Q500.00</div>
+            <ul style="list-style:none;font-size:12px;color:var(--text);">
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Stand publicitario (2.0×1.50m)</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Anuncio en redes sociales</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en manta vínilica</li>
+              <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Publicidad en pantalla (video, antes y durante)</li>
+              <li style="padding:4px 0;">✓ Acceso a conferencias</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WELCOME SECTION -->
+    <div class="welcome-section" id="sp-welcome-section">
+      <div class="welcome-banner">
+        <div class="welcome-check">✓</div>
+        <h2>¡Bienvenido!</h2>
+        <p id="sp-welcome-msg">Gracias por formar parte de nuestro Congreso</p>
+        <div class="receipt-tag" id="sp-welcome-tag"></div>
+      </div>
+
+      <div class="plan-info-box" id="sp-plan-box">
+        <h3 id="sp-plan-title"></h3>
+        <ul id="sp-plan-list"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>📤 Subir Material Publicitario</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" style="font-size:13px;margin-bottom:20px;">
+            El material que cargues será utilizado para la publicidad del evento según tu plan adquirido.
+            Asegúrate de subir archivos de buena calidad.
+          </div>
+
+          <!-- LOGO -->
+          <div class="fg">
+            <label>Logotipo de la Empresa <span style="color:var(--danger);">*</span></label>
+            <div class="upload-zone" id="logo-zone">
+              <input type="file" accept=".png,.jpg,.jpeg" id="logo-input" onchange="handleLogo(event)">
+              <div class="upload-zone-icon">🖼</div>
+              <h4>Arrastra tu logotipo aquí o haz clic</h4>
+              <p>Formato PNG o JPG · Alta resolución recomendada · Máx. 5 MB</p>
+            </div>
+            <div id="logo-preview"></div>
+          </div>
+
+          <!-- PHOTOS -->
+          <div class="fg" style="margin-top:24px;">
+            <label>Fotografías de Actividades de la Empresa <span style="color:var(--danger);">*</span> <span style="color:var(--muted);font-size:11px;">(máximo 2)</span></label>
+            <div class="upload-zone" id="photos-zone">
+              <input type="file" accept=".png,.jpg,.jpeg" multiple id="photos-input" onchange="handlePhotos(event)">
+              <div class="upload-zone-icon">📸</div>
+              <h4>Arrastra tus 2 mejores fotografías o haz clic</h4>
+              <p>Actividades de la empresa · PNG o JPG · Máx. 5 MB c/u</p>
+            </div>
+            <div class="preview-grid" id="photos-preview"></div>
+            <p id="photos-count-msg" style="font-size:12px;color:var(--muted);margin-top:8px;"></p>
+          </div>
+
+          <div id="upload-err" class="alert alert-danger" style="display:none;margin-top:16px;"></div>
+          <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;">
+            <button class="btn btn-primary" style="flex:1;" onclick="submitMaterial()">
+              ✅ Enviar material →
+            </button>
+            <button class="btn btn-outline" onclick="resetSponsor()">← Verificar otro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: EDIT RECEIPT ════ -->
+<div class="modal-overlay" id="modal-edit-receipt">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>✏ Editar Recibo <span id="edit-receipt-no-label"></span></h3>
+      <button class="modal-close" onclick="closeModal('modal-edit-receipt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-no">
+      <div class="fg">
+        <label>Nombre del Patrocinador</label>
+        <input type="text" id="edit-patron" placeholder="Nombre exacto">
+      </div>
+      <div class="row2">
+        <div class="fg">
+          <label>Lugar</label>
+          <input type="text" id="edit-lugar">
+        </div>
+        <div class="fg">
+          <label>Fecha</label>
+          <input type="date" id="edit-fecha" onchange="parseEditFecha(this.value)">
+          <input type="hidden" id="edit-dia">
+          <input type="hidden" id="edit-mes">
+          <input type="hidden" id="edit-anio">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Tipo de Plan</label>
+        <select id="edit-plan" onchange="onEditPlanChange()">
+          <option value="basico">Plan Básico — Q250.00</option>
+          <option value="premium">Plan Premium — Q500.00</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="fg">
+          <label>Monto (Q)</label>
+          <input type="number" id="edit-monto" step="0.01" oninput="document.getElementById('edit-letras').value=numToLetras(this.value)">
+        </div>
+        <div class="fg">
+          <label>Monto en letras</label>
+          <input type="text" id="edit-letras" readonly>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Observaciones</label>
+        <textarea id="edit-obs" rows="2"></textarea>
+      </div>
+      <div id="edit-receipt-err" class="alert alert-danger" style="display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-receipt')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditReceipt()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: RECEIPT ════ -->
+<div class="modal-overlay" id="modal-receipt">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📄 Recibo No. <span id="modal-receipt-no"></span></h3>
+      <button class="modal-close" onclick="closeModal('modal-receipt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="receipt-doc" class="rdoc"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-receipt')">Cerrar</button>
+      <button class="btn btn-primary" onclick="downloadReceipt()">⬇ Descargar / Imprimir PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: USER MANAGER ════ -->
+<div class="modal-overlay" id="modal-users">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>👥 Gestión de Usuarios</h3>
+      <button class="modal-close" onclick="closeModal('modal-users')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="font-size:13px;margin-bottom:20px;">
+        Solo el <strong>admin</strong> puede gestionar usuarios. El usuario <strong>admin</strong> no puede eliminarse.
+      </div>
+      <div id="users-table-wrap" style="overflow-x:auto;margin-bottom:4px;"></div>
+      <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
+      <h4 id="user-form-title" style="font-family:var(--display);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px;">Agregar Nuevo Usuario</h4>
+      <input type="hidden" id="edit-user-idx" value="">
+      <div class="row2">
+        <div class="fg"><label>Usuario <span style="color:var(--danger);">*</span></label><input type="text" id="nu-user" placeholder="nombre_usuario" autocomplete="off"></div>
+        <div class="fg"><label>Nombre completo</label><input type="text" id="nu-name" placeholder="Nombre y apellido" autocomplete="off"></div>
+      </div>
+      <div class="row2">
+        <div class="fg">
+          <label>Contraseña <span style="color:var(--danger);">*</span></label>
+          <div style="position:relative;">
+            <input type="text" id="nu-pass" placeholder="contraseña segura" autocomplete="off" style="padding-right:44px;">
+            <button type="button" onclick="document.getElementById('nu-pass').type=document.getElementById('nu-pass').type==='text'?'password':'text'"
+              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Rol</label>
+          <select id="nu-role">
+            <option value="tesorero">Tesorero</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div id="user-err" class="alert alert-danger" style="display:none;"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" id="user-form-btn" onclick="addUser()">Agregar usuario</button>
+        <button class="btn btn-outline" onclick="cancelEditUser()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: GOOGLE GUIDE ════ -->
+<div class="modal-overlay" id="modal-guide">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3>📖 Guía de Configuración — Google Sheets + Drive</h3>
+      <button class="modal-close" onclick="closeModal('modal-guide')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="alert alert-info" style="font-size:13px;margin-bottom:22px;">
+        Sigue estos pasos <strong>una sola vez</strong>. Después, todos los recibos y archivos de patrocinadores se guardarán automáticamente en tu Google.
+      </div>
+
+      <div class="guide-step">
+        <h4>1️⃣ Crear la hoja de cálculo en Google Sheets</h4>
+        <ul>
+          <li>Ve a <strong>sheets.google.com</strong> y crea una hoja nueva.</li>
+          <li>En la fila 1 agrega estos encabezados (una columna por celda):<br>
+            <code style="font-size:12px;">No. Recibo | Fecha | Lugar | Patrocinador | Monto Q | En letras | Plan | Observaciones | Timestamp</code>
+          </li>
+          <li>Guarda el ID de la hoja (parte de la URL entre <code>/d/</code> y <code>/edit</code>).</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>2️⃣ Crear la carpeta en Google Drive</h4>
+        <ul>
+          <li>Ve a <strong>drive.google.com</strong> y crea una carpeta llamada <em>"IV Congreso — Patrocinadores"</em>.</li>
+          <li>Copia el ID de la carpeta (parte final de la URL al abrirla).</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>3️⃣ Crear el Google Apps Script</h4>
+        <ul>
+          <li>En tu hoja de Sheets, ve a <strong>Extensiones → Apps Script</strong>.</li>
+          <li>Borra todo el código existente y pega el siguiente:</li>
+        </ul>
+        <div class="code-block">var SHEET_ID  = '1UvrK3AC9fEbdwI1XO1yvLNXPwOY1JAnrvCkQRjWX3VQ';
+var FOLDER_ID = '1feN_k3g4mcE01Fl4Jm8Xa8iDHtwne4-K';
+
+function doPost(e) {
+  try {
+    var type, no, fecha, lugar, patron, monto, letras, plan, obs;
+
+    if (e.postData.type === 'application/x-www-form-urlencoded') {
+      var p = e.parameter;
+      type   = p.type;
+      no     = p.no;
+      fecha  = p.fecha;
+      lugar  = p.lugar;
+      patron = p.patrocinador;
+      monto  = p.monto;
+      letras = p.letras;
+      plan   = p.plan;
+      obs    = p.obs || '';
+    } else {
+      var d  = JSON.parse(e.postData.contents);
+      type   = d.type;   no = d.no;
+      fecha  = d.fecha;  lugar  = d.lugar;
+      patron = d.patrocinador; monto = d.monto;
+      letras = d.letras; plan   = d.plan;
+      obs    = d.obs || '';
+    }
+
+    // ── Guardar recibo ──
+    if (type === 'receipt') {
+      var ss    = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getActiveSheet();
+      var noTxt = String(no).padStart(3, '0');
+      sheet.appendRow([noTxt, fecha, lugar, patron, monto, letras, plan, obs, new Date()]);
+      var last = sheet.getLastRow();
+      sheet.getRange(last, 1).setNumberFormat('@');
+      sheet.getRange(last, 5).setNumberFormat('@');
+    }
+
+    // ── Eliminar recibo ──
+    if (type === 'delete') {
+      var ss2    = SpreadsheetApp.openById(SHEET_ID);
+      var sheet2 = ss2.getActiveSheet();
+      var rows2  = sheet2.getDataRange().getValues();
+      var noFind = String(no).padStart(3, '0');
+      for (var i = rows2.length - 1; i >= 1; i--) {
+        if (String(rows2[i][0]).trim().padStart(3,'0') === noFind) {
+          sheet2.deleteRow(i + 1);
+          break;
+        }
+      }
+    }
+
+    // ── Guardar archivo en Drive ──
+    if (type === 'file') {
+      var folder  = DriveApp.getFolderById(FOLDER_ID);
+      var sub;
+      var nm      = patron || 'Sin_nombre';
+      var fols    = folder.getFoldersByName(nm);
+      sub = fols.hasNext() ? fols.next() : folder.createFolder(nm);
+      var fd  = (e.postData.type === 'application/x-www-form-urlencoded') ? e.parameter : JSON.parse(e.postData.contents);
+      var blob = Utilities.newBlob(Utilities.base64Decode(fd.content), fd.mimeType, fd.filename);
+      sub.createFile(blob);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ── Verificar patrocinador y listar recibos desde cualquier dispositivo ──
+function doGet(e) {
+  var action = e.parameter.action;
+  var ss     = SpreadsheetApp.openById(SHEET_ID);
+  var sheet  = ss.getActiveSheet();
+  var rows   = sheet.getDataRange().getValues();
+
+  // ── Listar todos los recibos (Tesorería multi-dispositivo) ──
+  if (action === 'list') {
+    var list = [];
+    for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row[0]) continue;
+      var f = String(row[1]).split('/');
+      list.push({
+        no:     String(row[0]).trim().padStart(3,'0'),
+        fecha:  String(row[1]),
+        dia:    f[0]||'', mes: f[1]||'', anio: f[2]||'',
+        lugar:  String(row[2]),
+        patron: String(row[3]).trim(),
+        monto:  String(row[4]),
+        letras: String(row[5]),
+        plan:   String(row[6]).toLowerCase().trim(),
+        obs:    String(row[7]||'')
+      });
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, receipts: list }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // ── Verificar un patrocinador específico ──
+  if (action === 'verify') {
+    var no     = String(e.parameter.no || '').trim().padStart(3, '0');
+    var patron = String(e.parameter.patron || '').trim();
+
+    for (var j = 1; j < rows.length; j++) {
+      var r2     = rows[j];
+      var rowNo  = String(r2[0]).trim().padStart(3, '0');
+      var rowPat = String(r2[3]).trim();
+
+      if (rowNo === no && rowPat === patron) {
+        var f2 = String(r2[1]).split('/');
+        return ContentService
+          .createTextOutput(JSON.stringify({
+            found: true, no: rowNo,
+            fecha: String(r2[1]),
+            dia: f2[0]||'', mes: f2[1]||'', anio: f2[2]||'',
+            lugar:        String(r2[2]),
+            patrocinador: rowPat,
+            monto:        String(r2[4]),
+            letras:       String(r2[5]),
+            plan:         String(r2[6]).toLowerCase().trim(),
+            obs:          String(r2[7]||'')
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ found: false }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'IV Congreso API OK' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;">⚠ Reemplaza <code>TU_SHEET_ID_AQUI</code> y <code>TU_FOLDER_ID_AQUI</code> con tus IDs reales.</p>
+      </div>
+
+      <div class="guide-step">
+        <h4>4️⃣ Publicar como Web App</h4>
+        <ul>
+          <li>Haz clic en <strong>Implementar → Nueva implementación</strong>.</li>
+          <li>Tipo: <strong>Aplicación web</strong>.</li>
+          <li>Ejecutar como: <strong>Yo (tu cuenta)</strong>.</li>
+          <li>Quién tiene acceso: <strong>Cualquier persona</strong>.</li>
+          <li>Haz clic en <strong>Implementar</strong> y autoriza los permisos.</li>
+          <li>Copia la URL que termina en <code>/exec</code>.</li>
+        </ul>
+      </div>
+
+      <div class="guide-step">
+        <h4>5️⃣ Pegar la URL aquí</h4>
+        <div class="fg" style="margin-top:12px;">
+          <label>URL del Web App (termina en /exec)</label>
+          <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <button class="btn btn-primary" onclick="saveGoogleUrl()">💾 Guardar URL</button>
+        <div id="guide-save-msg" style="display:none;margin-top:10px;" class="alert alert-success">✓ URL guardada correctamente. El sistema ya está conectado a Google.</div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-guide')">Cerrar guía</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA STORE (localStorage)
+// ══════════════════════════════════════════
+var DB = {
+  get: function(k,def){ try{ var v=localStorage.getItem('iv4_'+k); return v!==null?JSON.parse(v):def; }catch(e){return def;} },
+  set: function(k,v){ try{ localStorage.setItem('iv4_'+k,JSON.stringify(v)); }catch(e){} }
+};
+
+// Init default users if not set
+(function(){
+  if(!DB.get('users',null)){
+    DB.set('users',[
+      {user:'admin',pass:'Congreso2025!',role:'admin'},
+      {user:'tesorero1',pass:'Tesoreria2025',role:'tesorero'},
+      {user:'tesorero2',pass:'Tesoreria2025',role:'tesorero'}
+    ]);
+  }
+})();
+
+var receipts = DB.get('receipts',[]);
+var currentUser = null;
+var currentReceipt = null;
+var selectedPlan = 'basico';
+var logoFile = null;
+var photoFiles = [];
+// URL hardcodeada — funciona en TODOS los dispositivos sin configuración
+var SHEETS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbyta8kxJnNMgGW-GMUag7ru22OrCb9PF4bwLp7pntLQjXhbMltUn4AB7JGdkyVm_zOAwA/exec';
+var sheetsUrl = DB.get('sheets_url','') || SHEETS_URL_DEFAULT;
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function showTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function doLogin(){
+  var u=document.getElementById('lu').value.trim();
+  var p=document.getElementById('lp').value;
+  var err=document.getElementById('login-err');
+  var users=DB.get('users',[]);
+  var found=users.find(x=>x.user===u&&x.pass===p);
+  if(found){
+    currentUser=found;
+    err.style.display='none';
+    document.getElementById('treasury-login').style.display='none';
+    document.getElementById('treasury-dash').style.display='block';
+    document.getElementById('dash-user-label').textContent='Sesión iniciada como: '+found.user+' ('+found.role+')';
+    var adminBtns=document.getElementById('admin-btns');
+    var adminSheetsBtn=document.getElementById('admin-sheets-btn');
+    if(found.role==='admin'){
+      adminBtns.style.display='flex';
+      if(adminSheetsBtn) adminSheetsBtn.style.display='inline';
+    } else {
+      adminBtns.style.display='none';
+      if(adminSheetsBtn) adminSheetsBtn.style.display='none';
+    }
+    updateSheetsStatus();
+    prefillDate();
+    loadReceiptsFromSheets();
+  } else {
+    err.style.display='block';
+    err.textContent='Usuario o contraseña incorrectos. Inténtalo de nuevo.';
+  }
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('treasury-login').style.display='flex';
+  document.getElementById('treasury-dash').style.display='none';
+  document.getElementById('lu').value='';
+  document.getElementById('lp').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+function prefillDate(){
+  var d=new Date();
+  var y=d.getFullYear();
+  var m=String(d.getMonth()+1).padStart(2,'0');
+  var day=String(d.getDate()).padStart(2,'0');
+  var dateStr=y+'-'+m+'-'+day;
+  document.getElementById('f-fecha').value=dateStr;
+  document.getElementById('f-dia').value=d.getDate();
+  document.getElementById('f-mes').value=d.getMonth()+1;
+  document.getElementById('f-anio').value=y;
+}
+
+function parseFecha(val){
+  if(!val) return;
+  var parts=val.split('-');
+  document.getElementById('f-anio').value=parts[0]||'';
+  document.getElementById('f-mes').value=parseInt(parts[1])||'';
+  document.getElementById('f-dia').value=parseInt(parts[2])||'';
+}
+
+// ══════════════════════════════════════════
+// USER MANAGER
+// ══════════════════════════════════════════
+function openUserMgr(){
+  renderUsersTable();
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-name').value='';
+  document.getElementById('nu-pass').value='';
+  document.getElementById('nu-role').value='tesorero';
+  document.getElementById('user-err').style.display='none';
+  document.getElementById('edit-user-idx').value='';
+  document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+  document.getElementById('user-form-btn').textContent='Agregar usuario';
+  openModal('modal-users');
+}
+
+function renderUsersTable(){
+  var users=DB.get('users',[]);
+  var html='<table class="user-table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Contraseña</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>';
+  users.forEach(function(u,i){
+    var passShow='<span id="pass-dots-'+i+'">••••••••</span><span id="pass-text-'+i+'" style="display:none;">'+u.pass+'</span>';
+    var eyeBtn='<button class="btn btn-sm" style="padding:4px 8px;font-size:12px;background:var(--bg);border:1px solid var(--border);color:var(--navy);" onclick="togglePass('+i+')" title="Ver/ocultar">👁</button>';
+    html+='<tr>';
+    html+='<td><strong>'+u.user+'</strong></td>';
+    html+='<td>'+(u.name||'—')+'</td>';
+    html+='<td style="white-space:nowrap;">'+passShow+' '+eyeBtn+'</td>';
+    html+='<td><span class="badge '+(u.role==='admin'?'badge-admin':'badge-basic')+'">'+u.role+'</span></td>';
+    html+='<td><div class="user-actions">';
+    html+='<button class="btn btn-navy btn-sm" onclick="editUser('+i+')">✏ Editar</button>';
+    if(u.user!=='admin'){
+      html+='<button class="btn btn-danger btn-sm" onclick="deleteUser('+i+')">Eliminar</button>';
+    }
+    html+='</div></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('users-table-wrap').innerHTML=html;
+}
+
+function togglePass(i){
+  var dots=document.getElementById('pass-dots-'+i);
+  var text=document.getElementById('pass-text-'+i);
+  if(text.style.display==='none'){ dots.style.display='none'; text.style.display='inline'; }
+  else { dots.style.display='inline'; text.style.display='none'; }
+}
+
+function editUser(i){
+  var users=DB.get('users',[]);
+  var u=users[i];
+  document.getElementById('nu-user').value=u.user;
+  document.getElementById('nu-name').value=u.name||'';
+  document.getElementById('nu-pass').value=u.pass;
+  document.getElementById('nu-role').value=u.role;
+  document.getElementById('edit-user-idx').value=i;
+  document.getElementById('user-form-title').textContent='Editar Usuario: '+u.user;
+  document.getElementById('user-form-btn').textContent='Guardar cambios';
+  // Disable username field when editing admin
+  document.getElementById('nu-user').disabled=(u.user==='admin');
+  document.getElementById('user-err').style.display='none';
+}
+
+function addUser(){
+  var editIdx=document.getElementById('edit-user-idx').value;
+  var u=document.getElementById('nu-user').value.trim();
+  var n=document.getElementById('nu-name').value.trim();
+  var p=document.getElementById('nu-pass').value.trim();
+  var r=document.getElementById('nu-role').value;
+  var err=document.getElementById('user-err');
+  if(!u||!p){ err.style.display='block';err.textContent='Completa al menos usuario y contraseña.';return; }
+  var users=DB.get('users',[]);
+  if(editIdx!==''){
+    // EDIT mode
+    var idx=parseInt(editIdx);
+    users[idx].name=n;
+    users[idx].pass=p;
+    users[idx].role=r;
+    if(users[idx].user!=='admin') users[idx].user=u;
+    DB.set('users',users);
+    err.style.display='none';
+    document.getElementById('edit-user-idx').value='';
+    document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+    document.getElementById('user-form-btn').textContent='Agregar usuario';
+    document.getElementById('nu-user').disabled=false;
+    document.getElementById('nu-user').value='';
+    document.getElementById('nu-name').value='';
+    document.getElementById('nu-pass').value='';
+    document.getElementById('nu-role').value='tesorero';
+    renderUsersTable();
+    showToast('✓ Usuario "'+u+'" actualizado correctamente.');
+  } else {
+    // ADD mode
+    if(users.find(x=>x.user===u)){ err.style.display='block';err.textContent='Ese nombre de usuario ya existe.';return; }
+    users.push({user:u,name:n,pass:p,role:r});
+    DB.set('users',users);
+    err.style.display='none';
+    document.getElementById('nu-user').value='';
+    document.getElementById('nu-name').value='';
+    document.getElementById('nu-pass').value='';
+    document.getElementById('nu-role').value='tesorero';
+    renderUsersTable();
+    showToast('✓ Usuario "'+u+'" agregado correctamente.');
+  }
+}
+
+function deleteUser(i){
+  if(!confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
+  var users=DB.get('users',[]);
+  users.splice(i,1);
+  DB.set('users',users);
+  renderUsersTable();
+  showToast('Usuario eliminado.');
+}
+
+function cancelEditUser(){
+  document.getElementById('edit-user-idx').value='';
+  document.getElementById('user-form-title').textContent='Agregar Nuevo Usuario';
+  document.getElementById('user-form-btn').textContent='Agregar usuario';
+  document.getElementById('nu-user').value='';
+  document.getElementById('nu-name').value='';
+  document.getElementById('nu-pass').value='';
+  document.getElementById('nu-role').value='tesorero';
+  document.getElementById('nu-user').disabled=false;
+  document.getElementById('user-err').style.display='none';
+}
+
+// ══════════════════════════════════════════
+// GOOGLE GUIDE
+// ══════════════════════════════════════════
+function openGuide(){
+  if(sheetsUrl) document.getElementById('sheets-url-input').value=sheetsUrl;
+  openModal('modal-guide');
+}
+
+function saveGoogleUrl(){
+  var url=document.getElementById('sheets-url-input').value.trim();
+  if(!url){ showToast('⚠ Ingresa una URL válida.'); return; }
+  sheetsUrl=url;
+  DB.set('sheets_url',url);
+  document.getElementById('guide-save-msg').style.display='block';
+  updateSheetsStatus();
+  showToast('✓ URL de Google guardada. Actualiza el código HTML con la nueva URL para que funcione en todos los dispositivos.');
+}
+
+function updateSheetsStatus(){
+  var st=document.getElementById('sheets-state-txt');
+  var isAdmin=currentUser&&currentUser.role==='admin';
+  var adminBtn=document.getElementById('admin-sheets-btn');
+  if(sheetsUrl){
+    st.textContent='Conectado ✓';
+    st.style.color='var(--success)';
+  } else {
+    st.textContent='No configurado';
+    st.style.color='var(--danger)';
+  }
+  if(adminBtn) adminBtn.style.display=isAdmin?'inline':'none';
+}
+
+// ══════════════════════════════════════════
+// NUMBER → LETTERS (Spanish / Quetzales)
+// ══════════════════════════════════════════
+var _ones=['','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve',
+  'diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve'];
+var _tens=['','','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+var _hunds=['','cien','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+
+function _conv(n){
+  if(n===0) return '';
+  if(n<20) return _ones[n];
+  if(n<100){
+    var t=Math.floor(n/10),r=n%10;
+    return r===0?_tens[t]:_tens[t]+' y '+_ones[r];
+  }
+  if(n<1000){
+    var h=Math.floor(n/100),r2=n%100;
+    var base=h===1&&r2===0?'cien':_hunds[h];
+    return r2===0?base:base+' '+_conv(r2);
+  }
+  if(n<1000000){
+    var th=Math.floor(n/1000),r3=n%1000;
+    var prefix=th===1?'mil':_conv(th)+' mil';
+    return r3===0?prefix:prefix+' '+_conv(r3);
+  }
+  return n.toString();
+}
+
+function numToLetras(amount){
+  if(!amount||isNaN(amount)) return '';
+  var n=Math.round(parseFloat(amount)*100)/100;
+  var int=Math.floor(n);
+  var cents=Math.round((n-int)*100);
+  var base=int===0?'cero':_conv(int);
+  var result=base.charAt(0).toUpperCase()+base.slice(1)+' quetzales';
+  if(cents>0) result+=' con '+cents.toString().padStart(2,'0')+'/100';
+  else result+=' exactos';
+  return result;
+}
+
+function onMontoChange(){
+  var v=document.getElementById('f-monto').value;
+  document.getElementById('f-letras').value=numToLetras(v);
+}
+
+// ══════════════════════════════════════════
+// PLAN SELECT
+// ══════════════════════════════════════════
+function selectPlan(plan,el){
+  selectedPlan=plan;
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  var monto=plan==='basico'?250:500;
+  document.getElementById('f-monto').value=monto.toFixed(2);
+  document.getElementById('f-letras').value=numToLetras(monto);
+}
+
+// ══════════════════════════════════════════
+// RECEIPT NUMBER
+// ══════════════════════════════════════════
+function nextReceiptNo(){
+  // Find highest number used, then +1
+  var max=0;
+  receipts.forEach(function(r){ var n=parseInt(r.no)||0; if(n>max) max=n; });
+  return String(max+1).padStart(3,'0');
+}
+
+function updateNextBadge(){
+  document.getElementById('next-no-badge').textContent='No. '+nextReceiptNo();
+}
+
+function toggleManualNo(){
+  var wrap=document.getElementById('manual-no-wrap');
+  var btn=document.getElementById('btn-manual-no');
+  var isHidden=wrap.style.display==='none';
+  wrap.style.display=isHidden?'block':'none';
+  btn.style.background=isHidden?'var(--orange)':'var(--bg)';
+  btn.style.color=isHidden?'white':'var(--navy)';
+  btn.style.border=isHidden?'1px solid var(--orange)':'1px solid var(--border)';
+  if(!isHidden){
+    document.getElementById('f-no-manual').value='';
+    document.getElementById('manual-no-preview').textContent='';
+  }
+}
+
+function previewManualNo(val){
+  var n=parseInt(val);
+  if(!val||isNaN(n)||n<1){
+    document.getElementById('manual-no-preview').textContent='';
+    return;
+  }
+  var no=String(n).padStart(3,'0');
+  var exists=receipts.find(function(r){return r.no===no;});
+  var prev=document.getElementById('manual-no-preview');
+  if(exists){
+    prev.textContent='No.'+no+' ⚠ ya existe';
+    prev.style.color='var(--danger)';
+  } else {
+    prev.textContent='→ No.'+no;
+    prev.style.color='var(--success)';
+  }
+}
+
+function getReceiptNo(){
+  var manualWrap=document.getElementById('manual-no-wrap');
+  if(manualWrap.style.display!=='none'){
+    var val=document.getElementById('f-no-manual').value;
+    var n=parseInt(val);
+    if(!val||isNaN(n)||n<1) return null; // will trigger validation error
+    var no=String(n).padStart(3,'0');
+    var exists=receipts.find(function(r){return r.no===no;});
+    if(exists) return 'DUPLICATE:'+no;
+    return no;
+  }
+  return nextReceiptNo();
+}
+
+// ══════════════════════════════════════════
+// GENERATE RECEIPT
+// ══════════════════════════════════════════
+function generateReceipt(){
+  var lugar=document.getElementById('f-lugar').value.trim();
+  var dia=document.getElementById('f-dia').value.trim();
+  var mes=document.getElementById('f-mes').value.trim();
+  var anio=document.getElementById('f-anio').value.trim();
+  var patron=document.getElementById('f-patron').value.trim();
+  var monto=parseFloat(document.getElementById('f-monto').value)||0;
+  var letras=document.getElementById('f-letras').value.trim();
+  var obs=document.getElementById('f-obs').value.trim();
+  var err=document.getElementById('form-err');
+
+  if(!lugar||!dia||!mes||!anio||!patron||!monto){
+    err.style.display='block';
+    err.textContent='Por favor completa todos los campos obligatorios.';
+    return;
+  }
+  err.style.display='none';
+
+  var no=getReceiptNo();
+  if(!no){
+    err.style.display='block';
+    err.textContent='Ingresa un número de recibo válido en el campo manual.';
+    return;
+  }
+  if(no.startsWith('DUPLICATE:')){
+    err.style.display='block';
+    err.textContent='El No. '+no.replace('DUPLICATE:','')+ ' ya existe. Elige un número diferente o elimina el existente primero.';
+    return;
+  }
+  var r={no:no,lugar:lugar,dia:dia,mes:mes,anio:anio,patron:patron,monto:monto.toFixed(2),letras:letras,plan:selectedPlan,obs:obs,ts:Date.now()};
+  receipts.push(r);
+  DB.set('receipts',receipts);
+  currentReceipt=r;
+  sendToSheets(r);
+  renderReceiptDoc(r);
+  document.getElementById('modal-receipt-no').textContent=r.no;
+  openModal('modal-receipt');
+  renderReceiptsList();
+  updateStats();
+  updateNextBadge();
+  showToast('✓ Recibo No. '+r.no+' generado correctamente.');
+  // Reset form
+  document.getElementById('f-patron').value='';
+  document.getElementById('f-obs').value='';
+  // Reset manual number if it was used
+  var manWrap=document.getElementById('manual-no-wrap');
+  if(manWrap.style.display!=='none'){
+    manWrap.style.display='none';
+    document.getElementById('f-no-manual').value='';
+    document.getElementById('manual-no-preview').textContent='';
+    var btn=document.getElementById('btn-manual-no');
+    btn.style.background='var(--bg)';
+    btn.style.color='var(--navy)';
+    btn.style.border='1px solid var(--border)';
+  }
+}
+
+// ══════════════════════════════════════════
+// PLAN DATA
+// ══════════════════════════════════════════
+var PLANS={
+  basico:{
+    label:'Plan Básico',price:'Q250.00',
+    items:['Espacio en afiche','Anuncio en redes sociales (en toda la publicidad hasta el día del evento)','Espacio en manta vínilica','Publicidad en pantalla (en video, durante el evento)']
+  },
+  premium:{
+    label:'Plan Premium',price:'Q500.00',
+    items:['Stand publicitario (2.0×1.50m)','Espacio en afiche','Anuncio en redes sociales (en toda la publicidad hasta el día del evento)','Espacio en manta vínilica','Publicidad en pantalla (en video, antes y durante el evento)','Acceso a las conferencias (no incluye alimentación)']
+  }
+};
+
+var MESES=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ══════════════════════════════════════════
+// RENDER RECEIPT DOC (fiel al modelo)
+// ══════════════════════════════════════════
+function renderReceiptDoc(r){
+  var isBasic=r.plan==='basico';
+  var basicItems=PLANS.basico.items.map(i=>'<li>'+i+'</li>').join('');
+  var premItems=PLANS.premium.items.map(i=>'<li>'+i+'</li>').join('');
+  var mesNom=MESES[parseInt(r.mes)]||r.mes;
+  var montoFmt='Q '+parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  document.getElementById('receipt-doc').innerHTML=`
+  <div class="rdoc-top">
+    <div class="rdoc-brand">
+      <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:64px;width:auto;object-fit:contain;background:transparent;" alt="Logo IV Congreso">
+    </div>
+    <div class="rdoc-no-box">
+      <div class="rdoc-no-label">Recibo No.</div>
+      <span class="rdoc-no-val">${r.no}</span>
+    </div>
+  </div>
+
+  <table class="rdoc-table">
+    <tr>
+      <td class="rdoc-th" style="width:90px;">Lugar</td>
+      <td>${r.lugar}</td>
+      <td class="rdoc-th" style="width:40px;">Día</td>
+      <td style="width:50px;text-align:center;">${r.dia}</td>
+      <td class="rdoc-th" style="width:50px;">Mes</td>
+      <td style="width:100px;">${mesNom}</td>
+      <td class="rdoc-th" style="width:45px;">Año</td>
+      <td style="width:60px;">${r.anio}</td>
+    </tr>
+    <tr>
+      <td class="rdoc-th">Recibí de:</td>
+      <td colspan="4">${r.patron}</td>
+      <td class="rdoc-th">La cantidad de Q</td>
+      <td colspan="2" style="font-weight:700;font-size:14px;">${montoFmt}</td>
+    </tr>
+  </table>
+
+  <div class="rdoc-amount-row">
+    <div class="rdoc-amount-label">Cantidad (en letras):</div>
+    <div class="rdoc-amount-val">${r.letras}</div>
+  </div>
+
+  <div class="rdoc-concept">
+    <div class="rdoc-concept-label">Por concepto de:</div>
+    <div class="rdoc-plans">
+      <div class="rdoc-plan ${isBasic?'active':''}">
+        <div class="rdoc-plan-title">
+          <span class="rdoc-plan-circle ${isBasic?'filled':'empty'}"></span>
+          PLAN BÁSICO
+        </div>
+        <ul>${basicItems}</ul>
+      </div>
+      <div class="rdoc-plan ${!isBasic?'active':''}">
+        <div class="rdoc-plan-title">
+          <span class="rdoc-plan-circle ${!isBasic?'filled':'empty'}"></span>
+          PLAN PREMIUM
+        </div>
+        <ul>${premItems}</ul>
+      </div>
+    </div>
+    ${r.obs?'<p style="font-size:11px;color:#666;margin-top:10px;"><strong>Obs.:</strong> '+r.obs+'</p>':''}
+  </div>
+
+  <div class="rdoc-footer">
+    <div class="rdoc-footer-note">Su aporte como patrocinador sirve para contribuir los gastos inherentes del congreso.</div>
+    <div class="rdoc-footer-copies">
+      <span class="orig">Original: Patrocinador</span>
+      <span class="dupl">Duplicado: Organizadores</span>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// DOWNLOAD RECEIPT
+// ══════════════════════════════════════════
+function downloadReceipt(){
+  var r=currentReceipt; if(!r) return;
+  var content=document.getElementById('receipt-doc').innerHTML;
+  var w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<title>Recibo No. ${r.no} — IV Congreso Ingeniería Industrial</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Barlow,Arial,sans-serif;padding:30px;color:#111;font-size:12px;background:#fff;}
+.rdoc{border:1px solid #bbb;border-radius:6px;overflow:hidden;max-width:780px;margin:0 auto;}
+.rdoc-top{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:2px solid #111;gap:20px;}
+.rdoc-brand{display:flex;align-items:center;gap:12px;}
+/* logo replaces gear */.rdoc-brand img{height:64px;width:auto;object-fit:contain;}
+.rdoc-no-box{text-align:right;}
+.rdoc-no-label{background:#888;color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 18px;border-radius:4px;display:inline-block;margin-bottom:6px;}
+.rdoc-no-val{font-family:'Barlow Condensed',Arial,sans-serif;font-size:36px;font-weight:900;color:#0D1F3C;letter-spacing:2px;line-height:1;display:block;}
+.rdoc-table{width:100%;border-collapse:collapse;}
+.rdoc-table td{border:1px solid #bbb;padding:8px 12px;font-size:12px;vertical-align:middle;}
+.rdoc-th{background:#E8E8E8;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;color:#444;}
+.rdoc-amount-row{padding:12px 20px;border-bottom:1px solid #ccc;}
+.rdoc-amount-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:4px;}
+.rdoc-amount-val{font-size:15px;font-weight:700;color:#0D1F3C;border:1.5px solid #0D1F3C;border-radius:4px;padding:8px 14px;min-height:56px;}
+.rdoc-concept{padding:14px 20px;border-bottom:1px solid #ccc;}
+.rdoc-concept-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:10px;}
+.rdoc-plans{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.rdoc-plan{border:1.5px solid #bbb;border-radius:6px;padding:12px 14px;}
+.rdoc-plan.active{border-color:#E8580A;background:#FFF5EF;}
+.rdoc-plan-title{font-family:'Barlow Condensed',Arial,sans-serif;font-size:16px;font-weight:900;color:#0D1F3C;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.rdoc-plan-circle{width:18px;height:18px;border-radius:50%;border:2px solid;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rdoc-plan-circle.filled{background:#E8580A;border-color:#E8580A;}
+.rdoc-plan-circle.empty{border-color:#bbb;}
+.rdoc-plan ul{font-size:10.5px;padding-left:16px;line-height:1.75;color:#333;}
+.rdoc-footer{display:flex;align-items:flex-end;justify-content:space-between;padding:12px 20px;border-top:1px solid #ccc;}
+.rdoc-footer-note{font-size:10px;color:#666;max-width:320px;line-height:1.5;}
+.rdoc-footer-copies{text-align:right;font-size:10px;font-weight:700;line-height:1.8;}
+.orig{color:#E8580A;display:block;} .dupl{color:#0D1F3C;display:block;}
+@media print{@page{size:A4 landscape;margin:12mm;}body{padding:0;}}
+</style></head><body>
+<div class="rdoc">${content}</div>
+<script>window.onload=function(){window.print();};<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════
+// RECEIPTS LIST
+// ══════════════════════════════════════════
+function renderReceiptsList(){
+  var el=document.getElementById('receipts-list');
+  document.getElementById('list-count-badge').textContent=receipts.length+' registro'+(receipts.length!==1?'s':'');
+  if(!receipts.length){ el.innerHTML='<div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>'; return; }
+  el.innerHTML=[...receipts].reverse().map(r=>`
+    <div class="ri">
+      <div class="ri-no" onclick="viewReceipt('${r.no}')" style="cursor:pointer;">No.${r.no}</div>
+      <div style="flex:1;min-width:0;cursor:pointer;" onclick="viewReceipt('${r.no}')">
+        <div class="ri-name">${r.patron}</div>
+        <div class="ri-meta">${r.dia}/${r.mes}/${r.anio} &nbsp;·&nbsp;
+          <span class="badge ${r.plan==='basico'?'badge-basic':'badge-premium'}">${r.plan.toUpperCase()}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="ri-amount">Q ${parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
+        <button class="btn btn-navy btn-sm" onclick="openEditReceipt('${r.no}')" title="Editar recibo" style="flex-shrink:0;background:var(--navy2);">✏</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteReceipt('${r.no}')" title="Eliminar recibo" style="flex-shrink:0;">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewReceipt(no){
+  var r=receipts.find(x=>x.no===no); if(!r) return;
+  currentReceipt=r;
+  renderReceiptDoc(r);
+  document.getElementById('modal-receipt-no').textContent=r.no;
+  openModal('modal-receipt');
+}
+
+function updateStats(){
+  var basic=receipts.filter(r=>r.plan==='basico');
+  var prem=receipts.filter(r=>r.plan==='premium');
+  var total=receipts.reduce(function(s,r){return s+parseFloat(r.monto);},0);
+  document.getElementById('st-total').textContent=receipts.length;
+  document.getElementById('st-basic').textContent=basic.length;
+  document.getElementById('st-prem').textContent=prem.length;
+  document.getElementById('st-total-q').textContent='Q '+total.toLocaleString('es-GT',{minimumFractionDigits:2});
+  document.getElementById('st-last').textContent=receipts.length?'No.'+receipts[receipts.length-1].no:'—';
+}
+
+// ══════════════════════════════════════════
+// EDIT RECEIPT
+// ══════════════════════════════════════════
+function openEditReceipt(no){
+  var r=receipts.find(function(x){return x.no===no;});
+  if(!r) return;
+  document.getElementById('edit-no').value=r.no;
+  document.getElementById('edit-receipt-no-label').textContent='No.'+r.no;
+  document.getElementById('edit-patron').value=r.patron||'';
+  document.getElementById('edit-lugar').value=r.lugar||'';
+  document.getElementById('edit-plan').value=r.plan||'basico';
+  document.getElementById('edit-monto').value=parseFloat(r.monto)||'';
+  document.getElementById('edit-letras').value=r.letras||'';
+  document.getElementById('edit-obs').value=r.obs||'';
+  document.getElementById('edit-dia').value=r.dia||'';
+  document.getElementById('edit-mes').value=r.mes||'';
+  document.getElementById('edit-anio').value=r.anio||'';
+  // Set date picker
+  if(r.anio&&r.mes&&r.dia){
+    var y=r.anio;
+    var m=String(r.mes).padStart(2,'0');
+    var d=String(r.dia).padStart(2,'0');
+    document.getElementById('edit-fecha').value=y+'-'+m+'-'+d;
+  }
+  document.getElementById('edit-receipt-err').style.display='none';
+  openModal('modal-edit-receipt');
+}
+
+function parseEditFecha(val){
+  if(!val) return;
+  var p=val.split('-');
+  document.getElementById('edit-anio').value=p[0]||'';
+  document.getElementById('edit-mes').value=parseInt(p[1])||'';
+  document.getElementById('edit-dia').value=parseInt(p[2])||'';
+}
+
+function onEditPlanChange(){
+  var plan=document.getElementById('edit-plan').value;
+  var monto=plan==='basico'?250:500;
+  document.getElementById('edit-monto').value=monto.toFixed(2);
+  document.getElementById('edit-letras').value=numToLetras(monto);
+}
+
+function saveEditReceipt(){
+  var no=document.getElementById('edit-no').value;
+  var patron=document.getElementById('edit-patron').value.trim();
+  var lugar=document.getElementById('edit-lugar').value.trim();
+  var dia=document.getElementById('edit-dia').value;
+  var mes=document.getElementById('edit-mes').value;
+  var anio=document.getElementById('edit-anio').value;
+  var plan=document.getElementById('edit-plan').value;
+  var monto=parseFloat(document.getElementById('edit-monto').value)||0;
+  var letras=document.getElementById('edit-letras').value.trim();
+  var obs=document.getElementById('edit-obs').value.trim();
+  var err=document.getElementById('edit-receipt-err');
+
+  if(!patron||!monto){
+    err.style.display='block';
+    err.textContent='El nombre del patrocinador y el monto son obligatorios.';
+    return;
+  }
+  err.style.display='none';
+
+  var idx=receipts.findIndex(function(x){return x.no===no;});
+  if(idx===-1){ showToast('⚠ No se encontró el recibo.'); return; }
+
+  var updated={
+    no:no, patron:patron, lugar:lugar,
+    dia:dia, mes:mes, anio:anio,
+    monto:monto.toFixed(2), letras:letras,
+    plan:plan, obs:obs, ts:receipts[idx].ts
+  };
+  receipts[idx]=updated;
+  DB.set('receipts',receipts);
+
+  // Update in Google Sheets: delete old row + insert updated
+  if(sheetsUrl){
+    // First delete
+    var p1=new URLSearchParams();
+    p1.append('type','delete'); p1.append('no',no);
+    fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:p1}).catch(function(){});
+    // Then re-insert updated
+    setTimeout(function(){
+      var p2=new URLSearchParams();
+      p2.append('type','receipt');
+      p2.append('no',no);
+      p2.append('fecha',dia+'/'+mes+'/'+anio);
+      p2.append('lugar',lugar);
+      p2.append('patrocinador',patron);
+      p2.append('monto','Q'+monto.toFixed(2));
+      p2.append('letras',letras);
+      p2.append('plan',plan);
+      p2.append('obs',obs);
+      fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:p2}).catch(function(){});
+    },1200);
+  }
+
+  closeModal('modal-edit-receipt');
+  renderReceiptsList();
+  updateStats();
+  showToast('✓ Recibo No.'+no+' actualizado correctamente.');
+}
+
+// ══════════════════════════════════════════
+// DELETE RECEIPT
+// ══════════════════════════════════════════
+function confirmDeleteReceipt(no){
+  var r=receipts.find(function(x){return x.no===no;});
+  if(!r) return;
+  if(!confirm('¿Eliminar el recibo No.'+no+' de "'+r.patron+'"?\n\nEsta acción también lo eliminará de Google Sheets.')) return;
+  deleteReceipt(no);
+}
+
+function deleteReceipt(no){
+  // Remove from local array
+  receipts=receipts.filter(function(r){return r.no!==no;});
+  DB.set('receipts',receipts);
+  // Remove from Google Sheets
+  if(sheetsUrl){
+    var params=new URLSearchParams();
+    params.append('type','delete');
+    params.append('no', no);
+    fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:params}).catch(function(){});
+  }
+  renderReceiptsList();
+  updateStats();
+  showToast('🗑 Recibo No.'+no+' eliminado correctamente.');
+}
+
+// ══════════════════════════════════════════
+// LOAD RECEIPTS FROM SHEETS (multi-device sync)
+// ══════════════════════════════════════════
+function loadReceiptsFromSheets(){
+  // Always show local first for instant response
+  renderReceiptsList();
+  updateStats();
+  updateNextBadge();
+
+  if(!sheetsUrl) return;
+
+  var url = sheetsUrl + '?action=list';
+  fetch(url)
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if(!data.ok || !data.receipts) return;
+      var remote = data.receipts;
+      // Merge: add any remote receipts not in local cache
+      var changed = false;
+      remote.forEach(function(r){
+        var exists = receipts.find(function(x){ return x.no === r.no; });
+        if(!exists){
+          receipts.push({
+            no:     r.no,
+            patron: r.patron,
+            lugar:  r.lugar,
+            dia:    r.dia,
+            mes:    r.mes,
+            anio:   r.anio,
+            monto:  r.monto,
+            letras: r.letras,
+            plan:   r.plan,
+            obs:    r.obs||'',
+            ts:     Date.now()
+          });
+          changed = true;
+        }
+      });
+      // Also remove local receipts deleted elsewhere
+      var remoteNos = remote.map(function(r){ return r.no; });
+      var before = receipts.length;
+      receipts = receipts.filter(function(r){ return remoteNos.indexOf(r.no) !== -1; });
+      if(receipts.length !== before) changed = true;
+
+      if(changed){
+        DB.set('receipts', receipts);
+        renderReceiptsList();
+        updateStats();
+        updateNextBadge();
+        showToast('✓ Recibos sincronizados con Google Sheets ('+receipts.length+' registros)');
+      } else {
+        showToast('✓ Lista actualizada — '+receipts.length+' recibo'+(receipts.length!==1?'s':''));
+      }
+    })
+    .catch(function(){
+      // Sheets not reachable – use local cache silently
+    });
+}
+
+// ══════════════════════════════════════════
+// GOOGLE SHEETS INTEGRATION
+// ══════════════════════════════════════════
+function sendToSheets(r){
+  if(!sheetsUrl) return;
+  // Use form-encoded POST to avoid CORS preflight – Apps Script handles both
+  var params=new URLSearchParams();
+  params.append('type','receipt');
+  params.append('no',     String(r.no));
+  params.append('fecha',  r.dia+'/'+r.mes+'/'+r.anio);
+  params.append('lugar',  r.lugar);
+  params.append('patrocinador', r.patron);
+  params.append('monto',  'Q'+parseFloat(r.monto).toFixed(2));
+  params.append('letras', r.letras);
+  params.append('plan',   r.plan);
+  params.append('obs',    r.obs||'');
+  fetch(sheetsUrl,{
+    method:'POST',mode:'no-cors',
+    body:params
+  }).catch(function(){});
+}
+
+function sendFileToDrive(sponsor,filename,base64content,mimeType){
+  if(!sheetsUrl) return Promise.resolve();
+  return fetch(sheetsUrl,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:'file',sponsor,filename,content:base64content,mimeType})
+  }).catch(function(){});
+}
+
+// ══════════════════════════════════════════
+// SPONSOR VERIFICATION
+// ══════════════════════════════════════════
+function verifySponsor(){
+  var name=document.getElementById('sp-name').value.trim();
+  var rawNo=document.getElementById('sp-recibo').value.trim();
+  var no=rawNo.padStart(3,'0');
+  var err=document.getElementById('sp-err');
+  var btn=document.querySelector('#sp-verify-section .btn-navy');
+  if(!name||!rawNo){err.style.display='block';err.textContent='Por favor ingresa tu nombre y número de recibo.';return;}
+
+  // 1) Check local cache first
+  var found=receipts.find(function(r){return r.no===no&&r.patron.trim()===name;});
+  if(found){err.style.display='none';showWelcome(found);return;}
+
+  // 2) Query Google Sheets via Apps Script (any device)
+  if(!sheetsUrl){
+    err.style.display='block';
+    err.textContent='No se encontró el patrocinio. Contacta a tesorería para verificar tu registro.';
+    return;
+  }
+
+  btn.textContent='Verificando...';
+  btn.disabled=true;
+  err.style.display='none';
+
+  // Apps Script doGet returns JSON with CORS headers when deployed as "Anyone"
+  // We use a script tag injection (JSONP-style) to bypass any remaining CORS issues
+  var cbName='_iv4cb_'+Date.now();
+  var script=document.createElement('script');
+  var timeout=setTimeout(function(){
+    // Fallback: try plain fetch if JSONP fails
+    script.remove();
+    delete window[cbName];
+    var url=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
+    fetch(url,{method:'GET',headers:{'Accept':'application/json'}})
+      .then(function(res){return res.json();})
+      .then(function(data){handleVerifyResponse(data,name,no,btn,err);})
+      .catch(function(){
+        btn.textContent='Verificar mi patrocinio →';
+        btn.disabled=false;
+        err.style.display='block';
+        err.textContent='Error de conexión. Verifica tu internet e intenta de nuevo.';
+      });
+  },8000);
+
+  window[cbName]=function(data){
+    clearTimeout(timeout);
+    script.remove();
+    delete window[cbName];
+    handleVerifyResponse(data,name,no,btn,err);
+  };
+
+  // Try plain fetch first — works when CORS is properly configured
+  var url=sheetsUrl+'?action=verify&no='+encodeURIComponent(no)+'&patron='+encodeURIComponent(name);
+  fetch(url)
+    .then(function(res){
+      clearTimeout(timeout);
+      script.remove();
+      delete window[cbName];
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.json();
+    })
+    .then(function(data){handleVerifyResponse(data,name,no,btn,err);})
+    .catch(function(){
+      // fetch failed, wait for JSONP timeout fallback or try again
+      clearTimeout(timeout);
+      script.remove();
+      delete window[cbName];
+      btn.textContent='Verificar mi patrocinio →';
+      btn.disabled=false;
+      err.style.display='block';
+      err.textContent='No se pudo conectar con el servidor. Verifica tu URL de Google en configuración.';
+    });
+}
+
+function handleVerifyResponse(data,name,no,btn,err){
+  btn.textContent='Verificar mi patrocinio →';
+  btn.disabled=false;
+  if(data&&data.found){
+    var r={
+      no:     data.no||no,
+      patron: data.patrocinador||name,
+      lugar:  data.lugar||'',
+      dia:    data.dia||'',
+      mes:    data.mes||'',
+      anio:   data.anio||'',
+      monto:  String(data.monto||''),
+      letras: data.letras||'',
+      plan:   (data.plan||'basico').toLowerCase().trim(),
+      obs:    data.obs||''
+    };
+    var existing=receipts.find(function(x){return x.no===r.no;});
+    if(!existing){receipts.push(r);DB.set('receipts',receipts);}
+    err.style.display='none';
+    showWelcome(r);
+  } else {
+    err.style.display='block';
+    err.textContent='No se encontró ningún patrocinio con esos datos. Verifica que el nombre sea exactamente igual al del recibo, o contacta a tesorería.';
+  }
+}
+
+function showWelcome(r){
+  document.getElementById('sp-verify-section').style.display='none';
+  var ws=document.getElementById('sp-welcome-section');
+  ws.classList.add('show');
+  document.getElementById('sp-welcome-msg').textContent='¡Bienvenido/a, '+r.patron+'! Gracias por formar parte de nuestro Congreso.';
+  document.getElementById('sp-welcome-tag').textContent='Recibo No. '+r.no+' · Plan '+PLANS[r.plan].label;
+  var plan=PLANS[r.plan];
+  document.getElementById('sp-plan-title').innerHTML=(r.plan==='basico'?'⬜':'⭐')+' '+plan.label+' — '+plan.price;
+  document.getElementById('sp-plan-list').innerHTML=plan.items.map(i=>'<li><span class="plan-check">✓</span>'+i+'</li>').join('');
+  window._currentSponsorReceipt=r;
+}
+
+function resetSponsor(){
+  document.getElementById('sp-verify-section').style.display='block';
+  document.getElementById('sp-welcome-section').classList.remove('show');
+  document.getElementById('sp-name').value='';
+  document.getElementById('sp-recibo').value='';
+  document.getElementById('sp-err').style.display='none';
+  document.getElementById('logo-preview').innerHTML='';
+  document.getElementById('photos-preview').innerHTML='';
+  document.getElementById('logo-input').value='';
+  document.getElementById('photos-input').value='';
+  document.getElementById('photos-count-msg').textContent='';
+  document.getElementById('upload-err').style.display='none';
+  logoFile=null; photoFiles=[];
+  window._currentSponsorReceipt=null;
+}
+
+// ══════════════════════════════════════════
+// UPLOADS
+// ══════════════════════════════════════════
+function handleLogo(e){
+  var file=e.target.files[0]; if(!file) return;
+  if(file.size>5*1024*1024){ showToast('⚠ El logotipo excede 5 MB.'); return; }
+  logoFile=file;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('logo-preview').innerHTML=`
+      <div style="margin-top:12px;display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:var(--radius);padding:10px 14px;border:1px solid var(--border);">
+        <img src="${ev.target.result}" style="height:60px;max-width:120px;object-fit:contain;border-radius:4px;border:1px solid var(--border);">
+        <div><div style="font-size:13px;font-weight:700;color:var(--navy);">${file.name}</div>
+        <div style="font-size:12px;color:var(--muted);">${(file.size/1024).toFixed(0)} KB</div></div>
+      </div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handlePhotos(e){
+  var files=Array.from(e.target.files).slice(0,2);
+  photoFiles=files;
+  var grid=document.getElementById('photos-preview');
+  grid.innerHTML='';
+  var count=0;
+  files.forEach(function(file){
+    if(file.size>5*1024*1024){ showToast('⚠ '+file.name+' excede 5 MB.'); return; }
+    count++;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var d=document.createElement('div');
+      d.className='preview-thumb';
+      d.innerHTML='<img src="'+ev.target.result+'" alt="'+file.name+'">';
+      grid.appendChild(d);
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('photos-count-msg').textContent=count+' fotografía'+(count!==1?'s':'')+' seleccionada'+(count!==1?'s':'')+(count<2?' (se recomienda subir 2)':'');
+}
+
+function fileToBase64(file){
+  return new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(e){ res(e.target.result.split(',')[1]); };
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function submitMaterial(){
+  var err=document.getElementById('upload-err');
+  if(!logoFile){ err.style.display='block'; err.textContent='Por favor sube el logotipo de tu empresa.'; return; }
+  if(!photoFiles||photoFiles.length<1){ err.style.display='block'; err.textContent='Por favor sube al menos una fotografía de actividades.'; return; }
+  err.style.display='none';
+  var r=window._currentSponsorReceipt;
+  var sponsorName=r?r.patron:'Patrocinador';
+
+  var promises=[];
+  promises.push(fileToBase64(logoFile).then(function(b64){
+    return sendFileToDrive(sponsorName,'logo_'+logoFile.name,b64,logoFile.type);
+  }));
+  photoFiles.forEach(function(f,i){
+    promises.push(fileToBase64(f).then(function(b64){
+      return sendFileToDrive(sponsorName,'foto'+(i+1)+'_'+f.name,b64,f.type);
+    }));
+  });
+  Promise.all(promises).then(function(){
+    showToast('✓ Material enviado exitosamente. ¡Gracias!');
+    document.getElementById('upload-err').style.display='none';
+    document.querySelector('#sp-welcome-section .card .card-body').innerHTML=`
+      <div class="alert alert-success" style="text-align:center;padding:32px;font-size:16px;">
+        <div style="font-size:40px;margin-bottom:12px;">✅</div>
+        <strong>¡Material enviado exitosamente!</strong><br>
+        <span style="font-size:14px;color:var(--success);">Tu logotipo y fotografías han sido recibidos.<br>Serán utilizados en la publicidad del IV Congreso.</span>
+        <div style="margin-top:20px;">
+          <button class="btn btn-outline" onclick="resetSponsor()">← Verificar otro patrocinador</button>
+        </div>
+      </div>`;
+  }).catch(function(){
+    showToast('✓ Material recibido localmente. Configura Google Drive para envío automático.');
+  });
+}
+
+// ══════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+var _toastTimer=null;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){ t.classList.remove('show'); },3800);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){
+  showTab('sponsor');
+});
+</script>
+</body>
+</html>
+  .content-grid{grid-template-columns:1fr;padding:20px;}
+  .pg-header{padding:20px;}
+  .row4{grid-template-columns:1fr 1fr;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  .nav-brand{display:none;}
+  .plan-grid{grid-template-columns:1fr;}
+  .rdoc-plans{grid-template-columns:1fr;}
+  .row2,.row4{grid-template-columns:1fr;}
+  .sponsor-hero{padding:36px 20px 30px;}
+  .sponsor-hero h1{font-size:36px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ NAV ════════════════════ -->
+<nav>
+  <div class="nav-brand">
     <img src="https://i.ibb.co/1jyxWY6/01-Logo-2026-congreso.png" style="height:46px;width:auto;object-fit:contain;border-radius:6px;flex-shrink:0;background:transparent;" alt="Logo">
     <div class="nav-brand-text">
       <b>IV Congreso</b>
