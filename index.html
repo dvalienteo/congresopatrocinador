@@ -456,7 +456,7 @@ nav{
 <!-- ════════════════════ NAV ════════════════════ -->
 <nav>
   <div class="nav-brand">
-    <div class="nav-logo-circle">⚙</div>
+    <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:46px;width:auto;object-fit:contain;border-radius:6px;flex-shrink:0;background:transparent;" alt="Logo">
     <div class="nav-brand-text">
       <b>IV Congreso</b>
       <small>Ingeniería Industrial · Puerto Barrios</small>
@@ -554,22 +554,15 @@ nav{
               </span>
             </div>
 
-            <div class="row4" style="margin-bottom:16px;">
+            <div class="row2" style="margin-bottom:16px;">
               <div class="fg" style="margin-bottom:0;">
                 <label>Lugar</label>
                 <input type="text" id="f-lugar" value="Puerto Barrios, Izabal">
               </div>
               <div class="fg" style="margin-bottom:0;">
-                <label>Día</label>
-                <input type="number" id="f-dia" min="1" max="31" placeholder="DD">
-              </div>
-              <div class="fg" style="margin-bottom:0;">
-                <label>Mes</label>
-                <input type="number" id="f-mes" min="1" max="12" placeholder="MM">
-              </div>
-              <div class="fg" style="margin-bottom:0;">
-                <label>Año</label>
-                <input type="number" id="f-anio" placeholder="AAAA">
+                <label>Fecha</label>
+                <input type="date" id="f-fecha" onchange="parseFecha(this.value)">
+                <input type="hidden" id="f-dia"><input type="hidden" id="f-mes"><input type="hidden" id="f-anio">
               </div>
             </div>
 
@@ -622,7 +615,10 @@ nav{
       <div class="card">
         <div class="card-header">
           <h3>Recibos Emitidos</h3>
-          <span class="badge badge-navy" id="list-count-badge">0 registros</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="badge badge-navy" id="list-count-badge">0 registros</span>
+            <button class="btn btn-ghost btn-sm" onclick="loadReceiptsFromSheets()" title="Sincronizar con Google Sheets" style="background:var(--navy);color:white;padding:5px 12px;font-size:12px;">🔄 Sincronizar</button>
+          </div>
         </div>
         <div id="receipts-list" class="receipts-list">
           <div class="empty-state">No hay recibos registrados aún.<br>Genera el primero con el formulario.</div>
@@ -635,8 +631,9 @@ nav{
 <!-- ════════════════════ SPONSOR PAGE ════════════════════ -->
 <div class="page active" id="page-sponsor">
   <div class="sponsor-hero">
-    <span class="sponsor-hero-icon">⚙</span>
+    <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:90px;width:auto;display:block;margin:0 auto 16px;object-fit:contain;background:transparent;" alt="Logo">
     <h1>IV CONGRESO</h1>
+    <h2>Con enfásis en Logística</h2>
     <h2>Ingeniería Industrial</h2>
     <p>Portal oficial de verificación y registro de material para patrocinadores</p>
   </div>
@@ -755,6 +752,62 @@ nav{
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: EDIT RECEIPT ════ -->
+<div class="modal-overlay" id="modal-edit-receipt">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>✏ Editar Recibo <span id="edit-receipt-no-label"></span></h3>
+      <button class="modal-close" onclick="closeModal('modal-edit-receipt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-no">
+      <div class="fg">
+        <label>Nombre del Patrocinador</label>
+        <input type="text" id="edit-patron" placeholder="Nombre exacto">
+      </div>
+      <div class="row2">
+        <div class="fg">
+          <label>Lugar</label>
+          <input type="text" id="edit-lugar">
+        </div>
+        <div class="fg">
+          <label>Fecha</label>
+          <input type="date" id="edit-fecha" onchange="parseEditFecha(this.value)">
+          <input type="hidden" id="edit-dia">
+          <input type="hidden" id="edit-mes">
+          <input type="hidden" id="edit-anio">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Tipo de Plan</label>
+        <select id="edit-plan" onchange="onEditPlanChange()">
+          <option value="basico">Plan Básico — Q250.00</option>
+          <option value="premium">Plan Premium — Q500.00</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="fg">
+          <label>Monto (Q)</label>
+          <input type="number" id="edit-monto" step="0.01" oninput="document.getElementById('edit-letras').value=numToLetras(this.value)">
+        </div>
+        <div class="fg">
+          <label>Monto en letras</label>
+          <input type="text" id="edit-letras" readonly>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Observaciones</label>
+        <textarea id="edit-obs" rows="2"></textarea>
+      </div>
+      <div id="edit-receipt-err" class="alert alert-danger" style="display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-receipt')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditReceipt()">💾 Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -934,35 +987,60 @@ function doPost(e) {
   }
 }
 
-// ── Verificar patrocinador desde cualquier dispositivo ──
+// ── Verificar patrocinador y listar recibos desde cualquier dispositivo ──
 function doGet(e) {
   var action = e.parameter.action;
+  var ss     = SpreadsheetApp.openById(SHEET_ID);
+  var sheet  = ss.getActiveSheet();
+  var rows   = sheet.getDataRange().getValues();
 
+  // ── Listar todos los recibos (Tesorería multi-dispositivo) ──
+  if (action === 'list') {
+    var list = [];
+    for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row[0]) continue;
+      var f = String(row[1]).split('/');
+      list.push({
+        no:     String(row[0]).trim().padStart(3,'0'),
+        fecha:  String(row[1]),
+        dia:    f[0]||'', mes: f[1]||'', anio: f[2]||'',
+        lugar:  String(row[2]),
+        patron: String(row[3]).trim(),
+        monto:  String(row[4]),
+        letras: String(row[5]),
+        plan:   String(row[6]).toLowerCase().trim(),
+        obs:    String(row[7]||'')
+      });
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, receipts: list }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // ── Verificar un patrocinador específico ──
   if (action === 'verify') {
     var no     = String(e.parameter.no || '').trim().padStart(3, '0');
     var patron = String(e.parameter.patron || '').trim();
-    var ss     = SpreadsheetApp.openById(SHEET_ID);
-    var sheet  = ss.getActiveSheet();
-    var rows   = sheet.getDataRange().getValues();
 
-    for (var i = 1; i < rows.length; i++) {
-      var row    = rows[i];
-      var rowNo  = String(row[0]).trim().padStart(3, '0');
-      var rowPat = String(row[3]).trim();
+    for (var j = 1; j < rows.length; j++) {
+      var r2     = rows[j];
+      var rowNo  = String(r2[0]).trim().padStart(3, '0');
+      var rowPat = String(r2[3]).trim();
 
       if (rowNo === no && rowPat === patron) {
-        var f = String(row[1]).split('/');
+        var f2 = String(r2[1]).split('/');
         return ContentService
           .createTextOutput(JSON.stringify({
             found: true, no: rowNo,
-            fecha: String(row[1]),
-            dia: f[0]||'', mes: f[1]||'', anio: f[2]||'',
-            lugar: String(row[2]),
+            fecha: String(r2[1]),
+            dia: f2[0]||'', mes: f2[1]||'', anio: f2[2]||'',
+            lugar:        String(r2[2]),
             patrocinador: rowPat,
-            monto: String(row[4]),
-            letras: String(row[5]),
-            plan: String(row[6]).toLowerCase().trim(),
-            obs: String(row[7]||'')
+            monto:        String(r2[4]),
+            letras:       String(r2[5]),
+            plan:         String(r2[6]).toLowerCase().trim(),
+            obs:          String(r2[7]||'')
           }))
           .setMimeType(ContentService.MimeType.JSON);
       }
@@ -1076,10 +1154,8 @@ function doLogin(){
       if(adminSheetsBtn) adminSheetsBtn.style.display='none';
     }
     updateSheetsStatus();
-    renderReceiptsList();
-    updateStats();
-    updateNextBadge();
     prefillDate();
+    loadReceiptsFromSheets();
   } else {
     err.style.display='block';
     err.textContent='Usuario o contraseña incorrectos. Inténtalo de nuevo.';
@@ -1097,9 +1173,22 @@ function doLogout(){
 
 function prefillDate(){
   var d=new Date();
+  var y=d.getFullYear();
+  var m=String(d.getMonth()+1).padStart(2,'0');
+  var day=String(d.getDate()).padStart(2,'0');
+  var dateStr=y+'-'+m+'-'+day;
+  document.getElementById('f-fecha').value=dateStr;
   document.getElementById('f-dia').value=d.getDate();
   document.getElementById('f-mes').value=d.getMonth()+1;
-  document.getElementById('f-anio').value=d.getFullYear();
+  document.getElementById('f-anio').value=y;
+}
+
+function parseFecha(val){
+  if(!val) return;
+  var parts=val.split('-');
+  document.getElementById('f-anio').value=parts[0]||'';
+  document.getElementById('f-mes').value=parseInt(parts[1])||'';
+  document.getElementById('f-dia').value=parseInt(parts[2])||'';
 }
 
 // ══════════════════════════════════════════
@@ -1395,11 +1484,7 @@ function renderReceiptDoc(r){
   document.getElementById('receipt-doc').innerHTML=`
   <div class="rdoc-top">
     <div class="rdoc-brand">
-      <div class="rdoc-gear">⚙</div>
-      <div class="rdoc-brand-text">
-        <h2>IV Congreso<br>Ingeniería Industrial</h2>
-        <p>Puerto Barrios</p>
-      </div>
+      <img src="https://i.ibb.co/RGpq6X44/01-Logo-2026-2.png" style="height:64px;width:auto;object-fit:contain;background:transparent;" alt="Logo IV Congreso">
     </div>
     <div class="rdoc-no-box">
       <div class="rdoc-no-label">Recibo No.</div>
@@ -1478,9 +1563,7 @@ body{font-family:Barlow,Arial,sans-serif;padding:30px;color:#111;font-size:12px;
 .rdoc{border:1px solid #bbb;border-radius:6px;overflow:hidden;max-width:780px;margin:0 auto;}
 .rdoc-top{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:2px solid #111;gap:20px;}
 .rdoc-brand{display:flex;align-items:center;gap:12px;}
-.rdoc-gear{font-size:52px;line-height:1;color:#E8580A;}
-.rdoc-brand-text h2{font-family:'Barlow Condensed',Arial,sans-serif;font-size:24px;font-weight:900;color:#E8580A;letter-spacing:.5px;line-height:1.1;text-transform:uppercase;}
-.rdoc-brand-text p{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#666;margin-top:2px;}
+/* logo replaces gear */.rdoc-brand img{height:64px;width:auto;object-fit:contain;}
 .rdoc-no-box{text-align:right;}
 .rdoc-no-label{background:#888;color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 18px;border-radius:4px;display:inline-block;margin-bottom:6px;}
 .rdoc-no-val{font-family:'Barlow Condensed',Arial,sans-serif;font-size:36px;font-weight:900;color:#0D1F3C;letter-spacing:2px;line-height:1;display:block;}
@@ -1530,6 +1613,7 @@ function renderReceiptsList(){
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <div class="ri-amount">Q ${parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
+        <button class="btn btn-navy btn-sm" onclick="openEditReceipt('${r.no}')" title="Editar recibo" style="flex-shrink:0;background:var(--navy2);">✏</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDeleteReceipt('${r.no}')" title="Eliminar recibo" style="flex-shrink:0;">🗑</button>
       </div>
     </div>
@@ -1556,6 +1640,109 @@ function updateStats(){
 }
 
 // ══════════════════════════════════════════
+// EDIT RECEIPT
+// ══════════════════════════════════════════
+function openEditReceipt(no){
+  var r=receipts.find(function(x){return x.no===no;});
+  if(!r) return;
+  document.getElementById('edit-no').value=r.no;
+  document.getElementById('edit-receipt-no-label').textContent='No.'+r.no;
+  document.getElementById('edit-patron').value=r.patron||'';
+  document.getElementById('edit-lugar').value=r.lugar||'';
+  document.getElementById('edit-plan').value=r.plan||'basico';
+  document.getElementById('edit-monto').value=parseFloat(r.monto)||'';
+  document.getElementById('edit-letras').value=r.letras||'';
+  document.getElementById('edit-obs').value=r.obs||'';
+  document.getElementById('edit-dia').value=r.dia||'';
+  document.getElementById('edit-mes').value=r.mes||'';
+  document.getElementById('edit-anio').value=r.anio||'';
+  // Set date picker
+  if(r.anio&&r.mes&&r.dia){
+    var y=r.anio;
+    var m=String(r.mes).padStart(2,'0');
+    var d=String(r.dia).padStart(2,'0');
+    document.getElementById('edit-fecha').value=y+'-'+m+'-'+d;
+  }
+  document.getElementById('edit-receipt-err').style.display='none';
+  openModal('modal-edit-receipt');
+}
+
+function parseEditFecha(val){
+  if(!val) return;
+  var p=val.split('-');
+  document.getElementById('edit-anio').value=p[0]||'';
+  document.getElementById('edit-mes').value=parseInt(p[1])||'';
+  document.getElementById('edit-dia').value=parseInt(p[2])||'';
+}
+
+function onEditPlanChange(){
+  var plan=document.getElementById('edit-plan').value;
+  var monto=plan==='basico'?250:500;
+  document.getElementById('edit-monto').value=monto.toFixed(2);
+  document.getElementById('edit-letras').value=numToLetras(monto);
+}
+
+function saveEditReceipt(){
+  var no=document.getElementById('edit-no').value;
+  var patron=document.getElementById('edit-patron').value.trim();
+  var lugar=document.getElementById('edit-lugar').value.trim();
+  var dia=document.getElementById('edit-dia').value;
+  var mes=document.getElementById('edit-mes').value;
+  var anio=document.getElementById('edit-anio').value;
+  var plan=document.getElementById('edit-plan').value;
+  var monto=parseFloat(document.getElementById('edit-monto').value)||0;
+  var letras=document.getElementById('edit-letras').value.trim();
+  var obs=document.getElementById('edit-obs').value.trim();
+  var err=document.getElementById('edit-receipt-err');
+
+  if(!patron||!monto){
+    err.style.display='block';
+    err.textContent='El nombre del patrocinador y el monto son obligatorios.';
+    return;
+  }
+  err.style.display='none';
+
+  var idx=receipts.findIndex(function(x){return x.no===no;});
+  if(idx===-1){ showToast('⚠ No se encontró el recibo.'); return; }
+
+  var updated={
+    no:no, patron:patron, lugar:lugar,
+    dia:dia, mes:mes, anio:anio,
+    monto:monto.toFixed(2), letras:letras,
+    plan:plan, obs:obs, ts:receipts[idx].ts
+  };
+  receipts[idx]=updated;
+  DB.set('receipts',receipts);
+
+  // Update in Google Sheets: delete old row + insert updated
+  if(sheetsUrl){
+    // First delete
+    var p1=new URLSearchParams();
+    p1.append('type','delete'); p1.append('no',no);
+    fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:p1}).catch(function(){});
+    // Then re-insert updated
+    setTimeout(function(){
+      var p2=new URLSearchParams();
+      p2.append('type','receipt');
+      p2.append('no',no);
+      p2.append('fecha',dia+'/'+mes+'/'+anio);
+      p2.append('lugar',lugar);
+      p2.append('patrocinador',patron);
+      p2.append('monto','Q'+monto.toFixed(2));
+      p2.append('letras',letras);
+      p2.append('plan',plan);
+      p2.append('obs',obs);
+      fetch(sheetsUrl,{method:'POST',mode:'no-cors',body:p2}).catch(function(){});
+    },1200);
+  }
+
+  closeModal('modal-edit-receipt');
+  renderReceiptsList();
+  updateStats();
+  showToast('✓ Recibo No.'+no+' actualizado correctamente.');
+}
+
+// ══════════════════════════════════════════
 // DELETE RECEIPT
 // ══════════════════════════════════════════
 function confirmDeleteReceipt(no){
@@ -1579,6 +1766,65 @@ function deleteReceipt(no){
   renderReceiptsList();
   updateStats();
   showToast('🗑 Recibo No.'+no+' eliminado correctamente.');
+}
+
+// ══════════════════════════════════════════
+// LOAD RECEIPTS FROM SHEETS (multi-device sync)
+// ══════════════════════════════════════════
+function loadReceiptsFromSheets(){
+  // Always show local first for instant response
+  renderReceiptsList();
+  updateStats();
+  updateNextBadge();
+
+  if(!sheetsUrl) return;
+
+  var url = sheetsUrl + '?action=list';
+  fetch(url)
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if(!data.ok || !data.receipts) return;
+      var remote = data.receipts;
+      // Merge: add any remote receipts not in local cache
+      var changed = false;
+      remote.forEach(function(r){
+        var exists = receipts.find(function(x){ return x.no === r.no; });
+        if(!exists){
+          receipts.push({
+            no:     r.no,
+            patron: r.patron,
+            lugar:  r.lugar,
+            dia:    r.dia,
+            mes:    r.mes,
+            anio:   r.anio,
+            monto:  r.monto,
+            letras: r.letras,
+            plan:   r.plan,
+            obs:    r.obs||'',
+            ts:     Date.now()
+          });
+          changed = true;
+        }
+      });
+      // Also remove local receipts deleted elsewhere
+      var remoteNos = remote.map(function(r){ return r.no; });
+      var before = receipts.length;
+      receipts = receipts.filter(function(r){ return remoteNos.indexOf(r.no) !== -1; });
+      if(receipts.length !== before) changed = true;
+
+      if(changed){
+        DB.set('receipts', receipts);
+        renderReceiptsList();
+        updateStats();
+        updateNextBadge();
+        showToast('✓ Recibos sincronizados con Google Sheets ('+receipts.length+' registros)');
+      } else {
+        showToast('✓ Lista actualizada — '+receipts.length+' recibo'+(receipts.length!==1?'s':''));
+      }
+    })
+    .catch(function(){
+      // Sheets not reachable – use local cache silently
+    });
 }
 
 // ══════════════════════════════════════════
