@@ -587,8 +587,26 @@ nav{
               </div>
               <div class="fg" style="margin-bottom:0;">
                 <label>Fecha</label>
-                <input type="date" id="f-fecha" onchange="parseFecha(document.getElementById('f-fecha').value)">
-                <input type="hidden" id="f-dia"><input type="hidden" id="f-mes"><input type="hidden" id="f-anio">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                  <select id="f-dia" style="padding:11px 8px;font-size:14px;">
+                    <option value="">Día</option>
+                  </select>
+                  <select id="f-mes" style="padding:11px 8px;font-size:14px;" onchange="updateDias()">
+                    <option value="">Mes</option>
+                    <option value="1">Enero</option><option value="2">Febrero</option>
+                    <option value="3">Marzo</option><option value="4">Abril</option>
+                    <option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option>
+                    <option value="9">Septiembre</option><option value="10">Octubre</option>
+                    <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                  </select>
+                  <select id="f-anio" style="padding:11px 8px;font-size:14px;">
+                    <option value="">Año</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -659,7 +677,7 @@ nav{
   <div class="sponsor-hero">
     <img src="https://i.ibb.co/Kx7c7gDZ/01-Logo-2026-3.png" style="height:90px;width:auto;display:block;margin:0 auto 16px;object-fit:contain;background:transparent;" alt="Logo">
     <h1>IV CONGRESO</h1>
-    <h2>Con enfásis en Logística</h2>
+    <h2 style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--orange-light);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Con énfasis en Logística</h2>
     <h2>Ingeniería Industrial</h2>
     <p>Portal oficial de verificación y registro de material para patrocinadores</p>
   </div>
@@ -694,7 +712,7 @@ nav{
         <div class="card" style="border-top:4px solid var(--orange);">
           <div class="card-body" style="padding:18px;">
             <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Básico</div>
-            <div style="font-family:var(--display);font-size:22px;color:var(--orange);font-weight:900;margin-bottom:10px;">Incluye</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--orange);font-weight:900;margin-bottom:10px;">Q250.00</div>
             <ul style="list-style:none;font-size:12px;color:var(--text);">
               <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
               <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Anuncio en redes sociales</li>
@@ -706,7 +724,7 @@ nav{
         <div class="card" style="border-top:4px solid var(--gold);">
           <div class="card-body" style="padding:18px;">
             <div style="font-family:var(--display);font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">Plan Premium</div>
-            <div style="font-family:var(--display);font-size:22px;color:var(--gold);font-weight:900;margin-bottom:10px;">Incluye</div>
+            <div style="font-family:var(--display);font-size:22px;color:var(--gold);font-weight:900;margin-bottom:10px;">Q500.00</div>
             <ul style="list-style:none;font-size:12px;color:var(--text);">
               <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Stand publicitario (2.0×1.50m)</li>
               <li style="padding:4px 0;border-bottom:1px solid var(--border);">✓ Espacio en afiche</li>
@@ -802,10 +820,24 @@ nav{
         </div>
         <div class="fg">
           <label>Fecha</label>
-          <input type="date" id="edit-fecha" onchange="parseEditFecha(this.value)">
-          <input type="hidden" id="edit-dia">
-          <input type="hidden" id="edit-mes">
-          <input type="hidden" id="edit-anio">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <select id="edit-dia" style="padding:11px 8px;font-size:14px;"><option value="">Día</option></select>
+            <select id="edit-mes" style="padding:11px 8px;font-size:14px;" onchange="updateEditDias()">
+              <option value="">Mes</option>
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+            <select id="edit-anio" style="padding:11px 8px;font-size:14px;">
+              <option value="">Año</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="fg">
@@ -1233,46 +1265,45 @@ function doLogout(){
   document.getElementById('login-err').style.display='none';
 }
 
+function buildDias(selectEl, mes, anio, selectedDia){
+  var diasEnMes=[0,31,28,31,30,31,30,31,31,30,31,30,31];
+  if(anio&&mes==2&&((anio%4===0&&anio%100!==0)||anio%400===0)) diasEnMes[2]=29;
+  var max=mes?diasEnMes[parseInt(mes)]:31;
+  var cur=selectEl.value||selectedDia||'';
+  selectEl.innerHTML='<option value="">Día</option>';
+  for(var i=1;i<=max;i++){
+    var opt=document.createElement('option');
+    opt.value=i; opt.textContent=i;
+    if(String(i)===String(cur)) opt.selected=true;
+    selectEl.appendChild(opt);
+  }
+}
+
+function updateDias(){
+  var mes=document.getElementById('f-mes').value;
+  var anio=document.getElementById('f-anio').value;
+  var diaEl=document.getElementById('f-dia');
+  buildDias(diaEl, mes, anio, diaEl.value);
+}
+
+function updateEditDias(){
+  var mes=document.getElementById('edit-mes').value;
+  var anio=document.getElementById('edit-anio').value;
+  var diaEl=document.getElementById('edit-dia');
+  buildDias(diaEl, mes, anio, diaEl.value);
+}
+
 function prefillDate(){
   var d=new Date();
   var y=d.getFullYear();
-  var m=String(d.getMonth()+1).padStart(2,'0');
-  var day=String(d.getDate()).padStart(2,'0');
-  var dateStr=y+'-'+m+'-'+day;
-  // Set the date input
-  var fechaEl=document.getElementById('f-fecha');
-  fechaEl.value=dateStr;
-  // Always set hidden fields directly from JS Date object (safe on all devices)
-  document.getElementById('f-dia').value=d.getDate();
-  document.getElementById('f-mes').value=d.getMonth()+1;
+  var m=d.getMonth()+1;
+  var day=d.getDate();
+  // Set year and month selects
   document.getElementById('f-anio').value=y;
-}
-
-function parseFecha(val){
-  if(!val) return;
-  var dia='', mes='', anio='';
-  // Format 1: YYYY-MM-DD (standard, desktop Chrome)
-  if(/^\d{4}-\d{2}-\d{2}$/.test(val)){
-    var parts=val.split('-');
-    anio=parts[0]; mes=parseInt(parts[1]); dia=parseInt(parts[2]);
-  }
-  // Format 2: full Date string from Android (Thu Mar 19 2026 00:00:00...)
-  else {
-    var d=new Date(val);
-    if(!isNaN(d.getTime())){
-      // Use UTC values to avoid timezone shift
-      var raw=document.getElementById('f-fecha').value;
-      if(raw&&/^\d{4}-\d{2}-\d{2}$/.test(raw)){
-        var p=raw.split('-');
-        anio=p[0]; mes=parseInt(p[1]); dia=parseInt(p[2]);
-      } else {
-        anio=d.getFullYear(); mes=d.getMonth()+1; dia=d.getDate();
-      }
-    }
-  }
-  document.getElementById('f-anio').value=anio;
-  document.getElementById('f-mes').value=mes;
-  document.getElementById('f-dia').value=dia;
+  document.getElementById('f-mes').value=m;
+  // Build day options then set day
+  buildDias(document.getElementById('f-dia'), m, y, day);
+  document.getElementById('f-dia').value=day;
 }
 
 // ══════════════════════════════════════════
@@ -1554,19 +1585,9 @@ function getReceiptNo(){
 // ══════════════════════════════════════════
 function generateReceipt(){
   var lugar=document.getElementById('f-lugar').value.trim();
-  // Sanitize date fields – strip any accidental Date object strings
-  var diaRaw=document.getElementById('f-dia').value.trim();
-  var mesRaw=document.getElementById('f-mes').value.trim();
-  var anioRaw=document.getElementById('f-anio').value.trim();
-  // If hidden fields look like a full date string, re-parse from the date input
-  if(diaRaw.length>2||mesRaw.length>2||anioRaw.length>4||isNaN(parseInt(diaRaw))){
-    var fechaVal=document.getElementById('f-fecha').value;
-    if(fechaVal&&/^\d{4}-\d{2}-\d{2}$/.test(fechaVal)){
-      var fp=fechaVal.split('-');
-      anioRaw=fp[0]; mesRaw=String(parseInt(fp[1])); diaRaw=String(parseInt(fp[2]));
-    }
-  }
-  var dia=diaRaw; var mes=mesRaw; var anio=anioRaw;
+  var dia=document.getElementById('f-dia').value;
+  var mes=document.getElementById('f-mes').value;
+  var anio=document.getElementById('f-anio').value;
   var patron=document.getElementById('f-patron').value.trim();
   var monto=parseFloat(document.getElementById('f-monto').value)||0;
   var letras=document.getElementById('f-letras').value.trim();
@@ -1817,26 +1838,12 @@ function openEditReceipt(no){
   document.getElementById('edit-monto').value=parseFloat(r.monto)||'';
   document.getElementById('edit-letras').value=r.letras||'';
   document.getElementById('edit-obs').value=r.obs||'';
-  document.getElementById('edit-dia').value=r.dia||'';
-  document.getElementById('edit-mes').value=r.mes||'';
   document.getElementById('edit-anio').value=r.anio||'';
-  // Set date picker
-  if(r.anio&&r.mes&&r.dia){
-    var y=r.anio;
-    var m=String(r.mes).padStart(2,'0');
-    var d=String(r.dia).padStart(2,'0');
-    document.getElementById('edit-fecha').value=y+'-'+m+'-'+d;
-  }
+  document.getElementById('edit-mes').value=r.mes||'';
+  updateEditDias();
+  document.getElementById('edit-dia').value=r.dia||'';
   document.getElementById('edit-receipt-err').style.display='none';
   openModal('modal-edit-receipt');
-}
-
-function parseEditFecha(val){
-  if(!val) return;
-  var p=val.split('-');
-  document.getElementById('edit-anio').value=p[0]||'';
-  document.getElementById('edit-mes').value=parseInt(p[1])||'';
-  document.getElementById('edit-dia').value=parseInt(p[2])||'';
 }
 
 function onEditPlanChange(){
@@ -2003,7 +2010,7 @@ function sendToSheets(r){
   params.append('fecha',  r.dia+'/'+r.mes+'/'+r.anio);
   params.append('lugar',  r.lugar);
   params.append('patrocinador', r.patron);
-  params.append('monto',  'Q'+parseFloat(r.monto).toFixed(2));
+  params.append('monto',  parseFloat(r.monto).toFixed(2));
   params.append('letras', r.letras);
   params.append('plan',   r.plan);
   params.append('obs',    r.obs||'');
