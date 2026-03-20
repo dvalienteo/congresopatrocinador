@@ -1643,6 +1643,41 @@ function generateReceipt(){
 // ══════════════════════════════════════════
 // PLAN DATA
 // ══════════════════════════════════════════
+// ── Sanitiza fecha sin importar cómo llegó guardada ──
+function sanitizeFecha(r){
+  var dia=r.dia, mes=r.mes, anio=r.anio;
+  var MESES_NOM=['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  // Si dia parece una fecha completa (más de 2 chars y no es número puro)
+  if(dia && (String(dia).length > 2 || isNaN(parseInt(dia)))) {
+    // Intentar parsear desde el string completo
+    var d = new Date(String(dia));
+    if(!isNaN(d.getTime())) {
+      dia  = d.getDate();
+      mes  = d.getMonth() + 1;
+      anio = d.getFullYear();
+    }
+  }
+  // Si mes parece nombre de mes en inglés (Jan, Feb, Mar...)
+  var MESES_EN=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  if(mes && isNaN(parseInt(mes))) {
+    var idx = MESES_EN.indexOf(String(mes).toLowerCase().slice(0,3));
+    if(idx !== -1) mes = idx + 1;
+  }
+  // Si anio tiene más de 4 dígitos, limpiar
+  if(String(anio).length > 4) {
+    var d2 = new Date(r.dia);
+    if(!isNaN(d2.getTime())) anio = d2.getFullYear();
+  }
+  return {
+    dia:  parseInt(dia)  || '',
+    mes:  parseInt(mes)  || '',
+    anio: parseInt(anio) || '',
+    mesNom: MESES_NOM[parseInt(mes)] || mes || ''
+  };
+}
+
 var PLANS={
   basico:{
     label:'Plan Básico',price:'Q250.00',
@@ -1663,7 +1698,9 @@ function renderReceiptDoc(r){
   var isBasic=r.plan==='basico';
   var basicItems=PLANS.basico.items.map(i=>'<li>'+i+'</li>').join('');
   var premItems=PLANS.premium.items.map(i=>'<li>'+i+'</li>').join('');
-  var mesNom=MESES[parseInt(r.mes)]||r.mes;
+  // Sanitize fecha — handles any format from any device
+  var fecha=sanitizeFecha(r);
+  var mesNom=fecha.mesNom;
   var montoFmt='Q '+parseFloat(r.monto).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});
 
   document.getElementById('receipt-doc').innerHTML=`
@@ -1682,11 +1719,11 @@ function renderReceiptDoc(r){
       <td class="rdoc-th" style="width:90px;">Lugar</td>
       <td>${r.lugar}</td>
       <td class="rdoc-th" style="width:40px;">Día</td>
-      <td style="width:50px;text-align:center;">${r.dia}</td>
+      <td style="width:50px;text-align:center;">${fecha.dia}</td>
       <td class="rdoc-th" style="width:50px;">Mes</td>
       <td style="width:100px;">${mesNom}</td>
       <td class="rdoc-th" style="width:45px;">Año</td>
-      <td style="width:60px;">${r.anio}</td>
+      <td style="width:60px;">${fecha.anio}</td>
     </tr>
     <tr>
       <td class="rdoc-th">Recibí de:</td>
@@ -1792,7 +1829,7 @@ function renderReceiptsList(){
       <div class="ri-no" onclick="viewReceipt('${r.no}')" style="cursor:pointer;">No.${r.no}</div>
       <div style="flex:1;min-width:0;cursor:pointer;" onclick="viewReceipt('${r.no}')">
         <div class="ri-name">${r.patron}</div>
-        <div class="ri-meta">${r.dia}/${r.mes}/${r.anio} &nbsp;·&nbsp;
+        <div class="ri-meta">${(function(){var f=sanitizeFecha(r);return f.dia+'/'+f.mes+'/'+f.anio;})()}&nbsp;·&nbsp;
           <span class="badge ${r.plan==='basico'?'badge-basic':'badge-premium'}">${r.plan.toUpperCase()}</span>
         </div>
       </div>
@@ -1959,15 +1996,17 @@ function loadReceiptsFromSheets(){
       // Merge: add any remote receipts not in local cache
       var changed = false;
       remote.forEach(function(r){
+        // Sanitize fecha coming from Sheets (might be full date string)
+        var sf = sanitizeFecha(r);
         var exists = receipts.find(function(x){ return x.no === r.no; });
         if(!exists){
           receipts.push({
             no:     r.no,
             patron: r.patron,
             lugar:  r.lugar,
-            dia:    r.dia,
-            mes:    r.mes,
-            anio:   r.anio,
+            dia:    sf.dia,
+            mes:    sf.mes,
+            anio:   sf.anio,
             monto:  r.monto,
             letras: r.letras,
             plan:   r.plan,
@@ -1975,6 +2014,12 @@ function loadReceiptsFromSheets(){
             ts:     Date.now()
           });
           changed = true;
+        } else {
+          // Update existing with clean date if corrupted
+          if(String(exists.dia).length > 2 || isNaN(parseInt(exists.dia))){
+            exists.dia = sf.dia; exists.mes = sf.mes; exists.anio = sf.anio;
+            changed = true;
+          }
         }
       });
       // Also remove local receipts deleted elsewhere
